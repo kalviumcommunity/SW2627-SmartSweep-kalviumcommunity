@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const SmartSweepApp());
@@ -14,18 +15,9 @@ class SmartSweepApp extends StatelessWidget {
       title: 'SmartSweep',
       theme: ThemeData(
         useMaterial3: true,
+        colorSchemeSeed: Colors.green,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text(
-            'SmartSweep',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+      home: const HomeScreen(),
     );
   }
 }
