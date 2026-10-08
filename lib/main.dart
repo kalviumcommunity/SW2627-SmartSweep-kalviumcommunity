@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'splash_screen.dart';
 
 void main() {
   runApp(const SmartSweepApp());
@@ -17,7 +17,7 @@ class SmartSweepApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.green,
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
