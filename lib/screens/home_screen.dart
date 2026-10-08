@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'routes_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'SmartSweep',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -34,6 +37,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       body: pages[selectedIndex],
+
+      // Opens the new navigation assignment flow
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RoutesScreen(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.route),
+        label: const Text('Routes'),
+      ),
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
@@ -69,112 +86,42 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --------------------------------------------------
-// DASHBOARD
-// --------------------------------------------------
+// ---------------- Dashboard Page ----------------
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return const Padding(
+      padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Today's Overview",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
           Text(
-            'Monitor waste collection activity at a glance.',
+            'Dashboard',
             style: TextStyle(
-              color: Colors.grey.shade600,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // KPI CARDS
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.5,
-            children: const [
-              KpiCard(
-                title: 'Active Routes',
-                value: '12',
-                icon: Icons.local_shipping,
-              ),
-              KpiCard(
-                title: 'Pending Routes',
-                value: '5',
-                icon: Icons.pending_actions,
-              ),
-              KpiCard(
-                title: 'Completed',
-                value: '18',
-                icon: Icons.check_circle,
-              ),
-              KpiCard(
-                title: 'Alerts',
-                value: '3',
-                icon: Icons.warning,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 28),
-
-          const Text(
-            'Route Status',
-            style: TextStyle(
-              fontSize: 20,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
           ),
-
-          const SizedBox(height: 12),
-
-          const RouteStatusCard(
-            route: 'Route 01',
-            area: 'Vijay Nagar',
-            driver: 'Rahul',
-            status: 'Active',
+          SizedBox(height: 10),
+          Text(
+            'Monitor waste collection activities and route status.',
           ),
-
-          const RouteStatusCard(
-            route: 'Route 02',
-            area: 'Palasia',
-            driver: 'Aman',
-            status: 'Pending',
+          SizedBox(height: 30),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.local_shipping),
+              title: Text('Active Routes'),
+              subtitle: Text('Track ongoing waste collection routes'),
+            ),
           ),
-
-          const RouteStatusCard(
-            route: 'Route 03',
-            area: 'Rau',
-            driver: 'Neha',
-            status: 'Completed',
-          ),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.route),
-              label: const Text('View All Routes'),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.warning_amber),
+              title: Text('Incidents'),
+              subtitle: Text('View reported route problems'),
             ),
           ),
         ],
@@ -183,150 +130,36 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// KPI CARD
-// --------------------------------------------------
-
-class KpiCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-
-  const KpiCard({
-    super.key,
-    required this.title,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon),
-            const Spacer(),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(title),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// ROUTE STATUS CARD
-// --------------------------------------------------
-
-class RouteStatusCard extends StatelessWidget {
-  final String route;
-  final String area;
-  final String driver;
-  final String status;
-
-  const RouteStatusCard({
-    super.key,
-    required this.route,
-    required this.area,
-    required this.driver,
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        leading: const CircleAvatar(
-          child: Icon(Icons.local_shipping),
-        ),
-        title: Text(
-          route,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text('$area • Driver: $driver'),
-        trailing: Text(
-          status,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// ROUTES
-// --------------------------------------------------
+// ---------------- Routes Tab ----------------
 
 class RoutesPage extends StatelessWidget {
   const RoutesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search routes...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: const [
+        Text(
+          'Routes',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
           ),
         ),
-
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Chip(
-                avatar: Icon(Icons.filter_list, size: 18),
-                label: Text('Filter'),
-              ),
-            ],
+        SizedBox(height: 20),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.route),
+            title: Text('Zone A'),
+            subtitle: Text('Morning waste collection route'),
           ),
         ),
-
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: const [
-              RouteTile(
-                route: 'Route 01',
-                area: 'Vijay Nagar',
-                driver: 'Rahul',
-                status: 'Active',
-              ),
-              RouteTile(
-                route: 'Route 02',
-                area: 'Palasia',
-                driver: 'Aman',
-                status: 'Pending',
-              ),
-              RouteTile(
-                route: 'Route 03',
-                area: 'Rau',
-                driver: 'Neha',
-                status: 'Completed',
-              ),
-            ],
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.route),
+            title: Text('Zone B'),
+            subtitle: Text('Afternoon waste collection route'),
           ),
         ),
       ],
@@ -334,178 +167,7 @@ class RoutesPage extends StatelessWidget {
   }
 }
 
-class RouteTile extends StatelessWidget {
-  final String route;
-  final String area;
-  final String driver;
-  final String status;
-
-  const RouteTile({
-    super.key,
-    required this.route,
-    required this.area,
-    required this.driver,
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: const Icon(Icons.route),
-        title: Text(route),
-        subtitle: Text('$area • $driver'),
-        trailing: Text(status),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RouteDetailsPage(
-                route: route,
-                area: area,
-                driver: driver,
-                status: status,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// ROUTE DETAILS
-// --------------------------------------------------
-
-class RouteDetailsPage extends StatelessWidget {
-  final String route;
-  final String area;
-  final String driver;
-  final String status;
-
-  const RouteDetailsPage({
-    super.key,
-    required this.route,
-    required this.area,
-    required this.driver,
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(route),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              route,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            DetailRow(
-              label: 'Area',
-              value: area,
-            ),
-
-            DetailRow(
-              label: 'Driver',
-              value: driver,
-            ),
-
-            DetailRow(
-              label: 'Current Status',
-              value: status,
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              'Collection Stops',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.check_circle),
-              title: Text('Stop 1'),
-              subtitle: Text('Completed'),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.check_circle),
-              title: Text('Stop 2'),
-              subtitle: Text('Completed'),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.radio_button_unchecked),
-              title: Text('Stop 3'),
-              subtitle: Text('Pending'),
-            ),
-
-            const Spacer(),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Update Status'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const DetailRow({
-    super.key,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(value),
-        ],
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// ALERTS
-// --------------------------------------------------
+// ---------------- Alerts Page ----------------
 
 class AlertsPage extends StatelessWidget {
   const AlertsPage({super.key});
@@ -513,91 +175,68 @@ class AlertsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       children: const [
-        AlertTile(
-          title: 'Route 02 delayed',
-          description: 'Collection is running 20 minutes late.',
-          icon: Icons.warning,
+        Text(
+          'Alerts',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        AlertTile(
-          title: 'Vehicle maintenance',
-          description: 'Truck 12 requires maintenance.',
-          icon: Icons.build,
+        SizedBox(height: 20),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.warning),
+            title: Text('Vehicle Issue'),
+            subtitle: Text('No active vehicle issues'),
+          ),
         ),
-        AlertTile(
-          title: 'Route completed',
-          description: 'Route 03 has been completed.',
-          icon: Icons.check_circle,
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Route Status'),
+            subtitle: Text('No missed routes reported'),
+          ),
         ),
       ],
     );
   }
 }
 
-class AlertTile extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
-
-  const AlertTile({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        subtitle: Text(description),
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// REPORTS
-// --------------------------------------------------
+// ---------------- Reports Page ----------------
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.bar_chart,
-              size: 70,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Reports',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Collection performance reports will appear here.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: const [
+        Text(
+          'Reports',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
+        SizedBox(height: 20),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.analytics_outlined),
+            title: Text('Collection Report'),
+            subtitle: Text('View route completion statistics'),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.history),
+            title: Text('Route History'),
+            subtitle: Text('Review previous collection activity'),
+          ),
+        ),
+      ],
     );
   }
 }
