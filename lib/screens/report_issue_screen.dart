@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class ReportIssueScreen extends StatefulWidget {
@@ -9,175 +8,100 @@ class ReportIssueScreen extends StatefulWidget {
 }
 
 class _ReportIssueScreenState extends State<ReportIssueScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _descriptionController = TextEditingController();
+  final TextEditingController driverNameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController issueController = TextEditingController();
 
-  String? _selectedRoute;
-  String? _selectedIssue;
+  @override
+  void dispose() {
+    driverNameController.dispose();
+    phoneController.dispose();
+    issueController.dispose();
+    super.dispose();
+  }
 
-  final List<String> _routes = [
-    'Route 01',
-    'Route 02',
-    'Route 03',
-  ];
-
-  final List<String> _issues = [
-    'Missed collection',
-    'Vehicle delay',
-    'Overflowing bin',
-    'Damaged vehicle',
-    'Other',
-  ];
-
-  void _submitForm() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+  void submitIssue() {
+    final String driverName = driverNameController.text.trim();
+    final String phone = phoneController.text.trim();
+    final String issue = issueController.text.trim();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '$_selectedIssue reported for $_selectedRoute successfully!',
+          'Driver: $driverName\nPhone: $phone\nIssue: $issue',
         ),
-        backgroundColor: Colors.green,
       ),
     );
-
-    _formKey.currentState!.reset();
-    _descriptionController.clear();
-
-    setState(() {
-      _selectedRoute = null;
-      _selectedIssue = null;
-    });
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Report an Issue'),
+        title: const Text('Report Issue'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Report Collection Issue',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Report Collection Issue',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Provide details so the team can investigate.',
-                style: TextStyle(color: Colors.grey.shade600),
+            ),
+
+            const SizedBox(height: 24),
+
+            TextField(
+              controller: driverNameController,
+              keyboardType: TextInputType.name,
+              decoration: const InputDecoration(
+                labelText: 'Driver Name',
+                hintText: 'Enter driver name',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person),
               ),
-              const SizedBox(height: 24),
+            ),
 
-              // ROUTE SELECTION
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Select Route',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.route),
-                ),
-                items: _routes.map((route) {
-                  return DropdownMenuItem<String>(
-                    value: route,
-                    child: Text(route),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedRoute = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select a route';
-                  }
-                  return null;
-                },
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                hintText: 'Enter contact number',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone),
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // ISSUE TYPE
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Issue Type',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.warning_amber_outlined),
-                ),
-                items: _issues.map((issue) {
-                  return DropdownMenuItem<String>(
-                    value: issue,
-                    child: Text(issue),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedIssue = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select an issue type';
-                  }
-                  return null;
-                },
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: issueController,
+              keyboardType: TextInputType.multiline,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                labelText: 'Issue Description',
+                hintText: 'Describe the route or vehicle issue',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.report_problem),
+                alignLabelWithHint: true,
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // ISSUE DESCRIPTION
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Describe the issue...',
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                  prefixIcon: Icon(Icons.description_outlined),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please describe the issue';
-                  }
+            const SizedBox(height: 24),
 
-                  if (value.trim().length < 10) {
-                    return 'Enter at least 10 characters';
-                  }
-
-                  return null;
-                },
-              ),
-              const SizedBox(height: 28),
-
-              // SUBMIT BUTTON
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _submitForm,
-                  icon: const Icon(Icons.send),
-                  label: const Text('Submit Report'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ElevatedButton.icon(
+              onPressed: submitIssue,
+              icon: const Icon(Icons.send),
+              label: const Text('Submit Issue'),
+            ),
+          ],
         ),
       ),
     );
