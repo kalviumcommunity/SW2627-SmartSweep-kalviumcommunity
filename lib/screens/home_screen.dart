@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'report_issue_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,11 +12,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
 
-  final List<Widget> pages = const [
-    DashboardPage(),
-    RoutesPage(),
-    AlertsPage(),
-    ReportsPage(),
+  late final List<Widget> pages = [
+    DashboardPage(
+      onViewRoutes: () {
+        setState(() {
+          selectedIndex = 1;
+        });
+      },
+    ),
+    const RoutesPage(),
+    const AlertsPage(),
+    const ReportsPage(),
   ];
 
   @override
@@ -32,9 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
       body: pages[selectedIndex],
-
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) {
@@ -74,7 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
 // --------------------------------------------------
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+  final VoidCallback onViewRoutes;
+
+  const DashboardPage({
+    super.key,
+    required this.onViewRoutes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,16 +101,11 @@ class DashboardPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
             'Monitor waste collection activity at a glance.',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(color: Colors.grey.shade600),
           ),
-
           const SizedBox(height: 20),
 
           // KPI CARDS
@@ -114,22 +120,26 @@ class DashboardPage extends StatelessWidget {
               KpiCard(
                 title: 'Active Routes',
                 value: '12',
-                icon: Icons.local_shipping,
+                icon: Icons.route,
+                color: Colors.green,
               ),
               KpiCard(
                 title: 'Pending Routes',
                 value: '5',
                 icon: Icons.pending_actions,
+                color: Colors.orange,
               ),
               KpiCard(
                 title: 'Completed',
                 value: '18',
-                icon: Icons.check_circle,
+                icon: Icons.check_circle_outline,
+                color: Colors.blue,
               ),
               KpiCard(
                 title: 'Alerts',
                 value: '3',
-                icon: Icons.warning,
+                icon: Icons.warning_amber,
+                color: Colors.red,
               ),
             ],
           ),
@@ -143,7 +153,6 @@ class DashboardPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           const SizedBox(height: 12),
 
           const RouteStatusCard(
@@ -152,14 +161,12 @@ class DashboardPage extends StatelessWidget {
             driver: 'Rahul',
             status: 'Active',
           ),
-
           const RouteStatusCard(
             route: 'Route 02',
             area: 'Palasia',
             driver: 'Aman',
             status: 'Pending',
           ),
-
           const RouteStatusCard(
             route: 'Route 03',
             area: 'Rau',
@@ -172,9 +179,28 @@ class DashboardPage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: onViewRoutes,
               icon: const Icon(Icons.route),
               label: const Text('View All Routes'),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // LU 3.16: REPORT ISSUE FORM
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ReportIssueScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.report_problem_outlined),
+              label: const Text('Report an Issue'),
             ),
           ),
         ],
@@ -191,32 +217,42 @@ class KpiCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
+  final Color color;
 
   const KpiCard({
     super.key,
     required this.title,
     required this.value,
     required this.icon,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon),
-            const Spacer(),
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
             Text(
               value,
               style: const TextStyle(
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(title),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade700,
+              ),
+            ),
           ],
         ),
       ),
@@ -242,25 +278,48 @@ class RouteStatusCard extends StatelessWidget {
     required this.status,
   });
 
+  Color get statusColor {
+    switch (status) {
+      case 'Active':
+        return Colors.green;
+      case 'Pending':
+        return Colors.orange;
+      case 'Completed':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        leading: const CircleAvatar(
-          child: Icon(Icons.local_shipping),
+        leading: CircleAvatar(
+          backgroundColor: statusColor.withAlpha(30),
+          child: Icon(Icons.local_shipping_outlined, color: statusColor),
         ),
         title: Text(
           route,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text('$area • Driver: $driver'),
-        trailing: Text(
-          status,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: statusColor.withAlpha(30),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            status,
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -277,228 +336,33 @@ class RoutesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search routes...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        Text(
+          'All Routes',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Chip(
-                avatar: Icon(Icons.filter_list, size: 18),
-                label: Text('Filter'),
-              ),
-            ],
-          ),
+        SizedBox(height: 16),
+        RouteStatusCard(
+          route: 'Route 01',
+          area: 'Vijay Nagar',
+          driver: 'Rahul',
+          status: 'Active',
         ),
-
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: const [
-              RouteTile(
-                route: 'Route 01',
-                area: 'Vijay Nagar',
-                driver: 'Rahul',
-                status: 'Active',
-              ),
-              RouteTile(
-                route: 'Route 02',
-                area: 'Palasia',
-                driver: 'Aman',
-                status: 'Pending',
-              ),
-              RouteTile(
-                route: 'Route 03',
-                area: 'Rau',
-                driver: 'Neha',
-                status: 'Completed',
-              ),
-            ],
-          ),
+        RouteStatusCard(
+          route: 'Route 02',
+          area: 'Palasia',
+          driver: 'Aman',
+          status: 'Pending',
+        ),
+        RouteStatusCard(
+          route: 'Route 03',
+          area: 'Rau',
+          driver: 'Neha',
+          status: 'Completed',
         ),
       ],
-    );
-  }
-}
-
-class RouteTile extends StatelessWidget {
-  final String route;
-  final String area;
-  final String driver;
-  final String status;
-
-  const RouteTile({
-    super.key,
-    required this.route,
-    required this.area,
-    required this.driver,
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: const Icon(Icons.route),
-        title: Text(route),
-        subtitle: Text('$area • $driver'),
-        trailing: Text(status),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RouteDetailsPage(
-                route: route,
-                area: area,
-                driver: driver,
-                status: status,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------
-// ROUTE DETAILS
-// --------------------------------------------------
-
-class RouteDetailsPage extends StatelessWidget {
-  final String route;
-  final String area;
-  final String driver;
-  final String status;
-
-  const RouteDetailsPage({
-    super.key,
-    required this.route,
-    required this.area,
-    required this.driver,
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(route),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              route,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            DetailRow(
-              label: 'Area',
-              value: area,
-            ),
-
-            DetailRow(
-              label: 'Driver',
-              value: driver,
-            ),
-
-            DetailRow(
-              label: 'Current Status',
-              value: status,
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              'Collection Stops',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.check_circle),
-              title: Text('Stop 1'),
-              subtitle: Text('Completed'),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.check_circle),
-              title: Text('Stop 2'),
-              subtitle: Text('Completed'),
-            ),
-
-            const ListTile(
-              leading: Icon(Icons.radio_button_unchecked),
-              title: Text('Stop 3'),
-              subtitle: Text('Pending'),
-            ),
-
-            const Spacer(),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Update Status'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const DetailRow({
-    super.key,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(value),
-        ],
-      ),
     );
   }
 }
@@ -515,47 +379,26 @@ class AlertsPage extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: const [
-        AlertTile(
-          title: 'Route 02 delayed',
-          description: 'Collection is running 20 minutes late.',
-          icon: Icons.warning,
+        Text(
+          'Alerts',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        AlertTile(
-          title: 'Vehicle maintenance',
-          description: 'Truck 12 requires maintenance.',
-          icon: Icons.build,
+        SizedBox(height: 16),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.warning_amber, color: Colors.orange),
+            title: Text('Collection pending'),
+            subtitle: Text('Route 02 • Palasia'),
+          ),
         ),
-        AlertTile(
-          title: 'Route completed',
-          description: 'Route 03 has been completed.',
-          icon: Icons.check_circle,
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.notifications_active, color: Colors.red),
+            title: Text('Collection alert'),
+            subtitle: Text('Review the reported collection issue.'),
+          ),
         ),
       ],
-    );
-  }
-}
-
-class AlertTile extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
-
-  const AlertTile({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        subtitle: Text(description),
-      ),
     );
   }
 }
@@ -569,35 +412,22 @@ class ReportsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.bar_chart,
-              size: 70,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Reports',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Collection performance reports will appear here.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        Text(
+          'Reports',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-      ),
+        SizedBox(height: 16),
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.assessment_outlined, color: Colors.green),
+            title: Text('Collection Summary'),
+            subtitle: Text('View waste collection activity.'),
+          ),
+        ),
+      ],
     );
   }
 }
