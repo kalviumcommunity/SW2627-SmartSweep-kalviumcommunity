@@ -14,6 +14,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController issueController = TextEditingController();
 
+  // State variable for this assignment
+  bool _isUrgent = false;
+
   @override
   void dispose() {
     driverNameController.dispose();
@@ -23,30 +26,32 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
   }
 
   void submitIssue() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (_formKey.currentState!.validate()) {
+      final String driverName = driverNameController.text.trim();
+      final String phone = phoneController.text.trim();
+      final String issue = issueController.text.trim();
 
-    final String driverName = driverNameController.text.trim();
-    final String phone = phoneController.text.trim();
-    final String issue = issueController.text.trim();
+      final String priority = _isUrgent ? 'Urgent' : 'Normal';
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Issue submitted successfully!\n'
-          'Driver: $driverName\n'
-          'Phone: $phone\n'
-          'Issue: $issue',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Driver: $driverName\n'
+            'Phone: $phone\n'
+            'Issue: $issue\n'
+            'Priority: $priority',
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Report Issue')),
+      appBar: AppBar(
+        title: const Text('Report Issue'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -56,62 +61,52 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             children: [
               const Text(
                 'Report Collection Issue',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 24),
 
-              // DRIVER NAME
               TextFormField(
                 controller: driverNameController,
                 keyboardType: TextInputType.name,
                 decoration: const InputDecoration(
                   labelText: 'Driver Name',
                   hintText: 'Enter driver name',
-                  border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter the driver name';
+                    return 'Please enter driver name';
                   }
-
-                  if (value.trim().length < 2) {
-                    return 'Driver name must be at least 2 characters';
-                  }
-
                   return null;
                 },
               ),
 
               const SizedBox(height: 16),
 
-              // PHONE NUMBER
               TextFormField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
-                  hintText: 'Enter 10-digit contact number',
-                  border: OutlineInputBorder(),
+                  hintText: 'Enter contact number',
                   prefixIcon: Icon(Icons.phone),
+                  border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter the phone number';
+                    return 'Please enter phone number';
                   }
-
-                  if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
-                    return 'Enter a valid 10-digit phone number';
-                  }
-
                   return null;
                 },
               ),
 
               const SizedBox(height: 16),
 
-              // ISSUE DESCRIPTION
               TextFormField(
                 controller: issueController,
                 keyboardType: TextInputType.multiline,
@@ -119,21 +114,68 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Issue Description',
                   hintText: 'Describe the route or vehicle issue',
-                  border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.report_problem),
+                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please describe the issue';
                   }
-
-                  if (value.trim().length < 10) {
-                    return 'Description must be at least 10 characters';
-                  }
-
                   return null;
                 },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Stateful feature for this assignment
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text(
+                  'Urgent Issue',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  _isUrgent ? 'Urgent Priority' : 'Normal Priority',
+                ),
+                value: _isUrgent,
+                onChanged: (value) {
+                  setState(() {
+                    _isUrgent = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _isUrgent
+                          ? Icons.warning_amber
+                          : Icons.check_circle_outline,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _isUrgent
+                            ? 'Status: This issue requires urgent attention.'
+                            : 'Status: This issue has normal priority.',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 24),
