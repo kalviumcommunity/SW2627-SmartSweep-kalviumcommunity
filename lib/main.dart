@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'splash_screen.dart';
+import 'screens/route_sync_screen.dart';
 
 void main() {
   runApp(const SmartSweepApp());
@@ -11,13 +11,10 @@ class SmartSweepApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'SmartSweep',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.green,
-      ),
-      home: const SplashScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
+      home: const RouteSyncScreen(),
     );
   }
 }
