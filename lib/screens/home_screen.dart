@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
+
 import 'report_issue_screen.dart';
+import 'route_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,10 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.person_outline)),
         ],
       ),
       body: pages[selectedIndex],
@@ -82,10 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class DashboardPage extends StatelessWidget {
   final VoidCallback onViewRoutes;
 
-  const DashboardPage({
-    super.key,
-    required this.onViewRoutes,
-  });
+  const DashboardPage({super.key, required this.onViewRoutes});
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +91,7 @@ class DashboardPage extends StatelessWidget {
         children: [
           const Text(
             "Today's Overview",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
           Text(
@@ -148,10 +140,7 @@ class DashboardPage extends StatelessWidget {
 
           const Text(
             'Route Status',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
 
@@ -194,9 +183,7 @@ class DashboardPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const ReportIssueScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ReportIssueScreen()),
                 );
               },
               icon: const Icon(Icons.report_problem_outlined),
@@ -240,18 +227,13 @@ class KpiCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey.shade700,
-              ),
+              style: TextStyle(color: Colors.grey.shade700),
             ),
           ],
         ),
@@ -300,26 +282,17 @@ class RouteStatusCard extends StatelessWidget {
           backgroundColor: statusColor.withAlpha(30),
           child: Icon(Icons.local_shipping_outlined, color: statusColor),
         ),
-        title: Text(
-          route,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(route, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('$area • Driver: $driver'),
         trailing: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: statusColor.withAlpha(30),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             status,
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: statusColor, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -336,34 +309,7 @@ class RoutesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: const [
-        Text(
-          'All Routes',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 16),
-        RouteStatusCard(
-          route: 'Route 01',
-          area: 'Vijay Nagar',
-          driver: 'Rahul',
-          status: 'Active',
-        ),
-        RouteStatusCard(
-          route: 'Route 02',
-          area: 'Palasia',
-          driver: 'Aman',
-          status: 'Pending',
-        ),
-        RouteStatusCard(
-          route: 'Route 03',
-          area: 'Rau',
-          driver: 'Neha',
-          status: 'Completed',
-        ),
-      ],
-    );
+    return const RouteListScreen();
   }
 }
 
