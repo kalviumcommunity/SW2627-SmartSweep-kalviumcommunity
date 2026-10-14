@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/route_sync_screen.dart';
+import 'screens/route_status_screen.dart';
 
 void main() {
   runApp(const SmartSweepApp());
@@ -14,7 +14,7 @@ class SmartSweepApp extends StatelessWidget {
       title: 'SmartSweep',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
-      home: const RouteSyncScreen(),
+      home: const RouteStatusScreen(),
     );
   }
 }
