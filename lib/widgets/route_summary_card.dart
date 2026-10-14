@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
 
-class RouteSummaryCard extends StatelessWidget {
-  const RouteSummaryCard({
-    super.key,
-    required this.routeName,
-    required this.driverName,
-    required this.zonesDone,
-    required this.zonesTotal,
-    required this.status,
-  });
+import '../models/waste_collection_route.dart';
 
-  final String routeName;
-  final String driverName;
-  final int zonesDone;
-  final int zonesTotal;
-  final String status; // completed, in progress, delayed, missed
+class RouteSummaryCard extends StatelessWidget {
+  const RouteSummaryCard({super.key, required this.route});
+
+  final WasteCollectionRoute route;
 
   Color _statusColor() {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return Colors.green.shade700;
+    if (route.isCompleted) {
+      return Colors.green.shade700;
+    }
+
+    switch (route.status.toLowerCase()) {
       case 'in progress':
         return Colors.blue.shade700;
       case 'delayed':
@@ -34,7 +27,9 @@ class RouteSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _statusColor();
-    final progress = zonesTotal == 0 ? 0.0 : zonesDone / zonesTotal;
+    final progress = route.zonesTotal == 0
+        ? 0.0
+        : route.zonesDone / route.zonesTotal;
 
     return Card(
       elevation: 0,
@@ -51,29 +46,36 @@ class RouteSummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    routeName,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
+                    route.routeName,
+                    style: Theme.of(context).textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withAlpha(30),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    status,
+                    route.status,
                     style: TextStyle(
-                        color: color, fontWeight: FontWeight.w600, fontSize: 12),
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 4),
-            Text('Driver: $driverName', style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              'Driver: ${route.driverName}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -85,7 +87,7 @@ class RouteSummaryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text('$zonesDone of $zonesTotal zones serviced'),
+            Text(route.label()),
           ],
         ),
       ),
