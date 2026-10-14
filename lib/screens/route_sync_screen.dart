@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/loading_overlay.dart';
-
 class RouteSyncScreen extends StatefulWidget {
   const RouteSyncScreen({super.key});
 
@@ -10,169 +8,189 @@ class RouteSyncScreen extends StatefulWidget {
 }
 
 class _RouteSyncScreenState extends State<RouteSyncScreen> {
-  bool isLoading = false;
-  bool simulateFailure = false;
-  String? resultMessage;
+  final TextEditingController routeNumberController =
+      TextEditingController();
+
+  bool isProcessing = false;
   bool resultIsError = false;
+  String? resultMessage;
 
-  // Simulated asynchronous data operation.
-  // Replace this with a real API or database call later.
-  Future<void> _performSync() async {
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (simulateFailure) {
-      throw Exception('Simulated network timeout');
-    }
+  @override
+  void dispose() {
+    routeNumberController.dispose();
+    super.dispose();
   }
 
-  // Task 1 & 3: Handle asynchronous errors using try/catch.
-  Future<void> _syncRouteData() async {
-    if (isLoading) return;
-
+  Future<void> processRoute() async {
     setState(() {
-      isLoading = true;
+      isProcessing = true;
       resultMessage = null;
       resultIsError = false;
     });
 
     try {
-      await _performSync();
+      // Risky operation:
+      // int.parse throws FormatException for invalid input.
+      final int routeNumber =
+          int.parse(routeNumberController.text.trim());
 
-      if (!mounted) return;
+      // Simulates an asynchronous operation.
+      await Future.delayed(const Duration(seconds: 1));
 
-      setState(() {
-        resultMessage = 'Route data synced successfully (demo).';
-        resultIsError = false;
-      });
-    } catch (_) {
-      // Task 2: Never display a raw exception to users.
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         resultMessage =
-            'Unable to sync route data. '
-            'Please try again.';
+            'Route $routeNumber processed successfully.';
+        resultIsError = false;
+      });
+    } on FormatException {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        resultMessage =
+            'Please enter a valid route number, for example 101.';
+        resultIsError = true;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        resultMessage =
+            'Something went wrong while processing the route. Please try again.';
         resultIsError = true;
       });
     } finally {
-      // Always clear the loader on success or failure.
       if (mounted) {
         setState(() {
-          isLoading = false;
+          isProcessing = false;
         });
       }
     }
   }
 
+  void retry() {
+    setState(() {
+      resultMessage = null;
+      resultIsError = false;
+    });
+
+    processRoute();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final resultColor = resultIsError
-        ? Colors.red.shade700
-        : Colors.green.shade700;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('SmartSweep - Route Sync')),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              const Text(
-                'Demonstration of route data synchronization '
-                'with asynchronous error handling.',
+      appBar: AppBar(
+        title: const Text('Route Processing'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Process Route',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
               ),
+            ),
 
-              const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
-              // Simulate an operation failure for testing.
-              SwitchListTile(
-                title: const Text('Simulate failure'),
-                subtitle: const Text(
-                  'Enable to test error handling and retry.',
-                ),
-                value: simulateFailure,
-                onChanged: isLoading
-                    ? null
-                    : (value) {
-                        setState(() {
-                          simulateFailure = value;
-                        });
-                      },
+            const Text(
+              'Enter a route number to process the route.',
+            ),
+
+            const SizedBox(height: 24),
+
+            TextField(
+              controller: routeNumberController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Route Number',
+                hintText: 'Example: 101',
+                prefixIcon: Icon(Icons.route),
+                border: OutlineInputBorder(),
               ),
+            ),
 
-              const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-              // Disable repeated requests during loading.
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton.icon(
-                  onPressed: isLoading ? null : _syncRouteData,
-                  icon: isLoading
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.sync),
-                  label: Text(isLoading ? 'Syncing...' : 'Sync route data'),
-                ),
+            ElevatedButton.icon(
+              onPressed: isProcessing ? null : processRoute,
+              icon: isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.sync),
+              label: Text(
+                isProcessing
+                    ? 'Processing...'
+                    : 'Process Route',
               ),
+            ),
 
-              // Success or error message.
-              if (resultMessage != null) ...[
-                const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-                Card(
-                  color: resultColor.withAlpha(25),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          leading: Icon(
-                            resultIsError
-                                ? Icons.error_outline
-                                : Icons.check_circle_outline,
-                            color: resultColor,
-                          ),
-                          title: Text(
-                            resultIsError ? 'Sync failed' : 'Sync complete',
-                            style: TextStyle(
-                              color: resultColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: Text(resultMessage!),
-                        ),
-
-                        // Task 4: Allow the user to retry.
-                        if (resultIsError) ...[
-                          const SizedBox(height: 12),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: isLoading ? null : _syncRouteData,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Retry Sync'),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+            if (resultMessage != null)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: resultIsError
+                        ? Colors.red
+                        : Colors.green,
                   ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
-            ],
-          ),
+                child: Column(
+                  children: [
+                    Icon(
+                      resultIsError
+                          ? Icons.error_outline
+                          : Icons.check_circle_outline,
+                      size: 40,
+                      color: resultIsError
+                          ? Colors.red
+                          : Colors.green,
+                    ),
 
-          if (isLoading) const LoadingOverlay(message: 'Syncing route data...'),
-        ],
+                    const SizedBox(height: 10),
+
+                    Text(
+                      resultMessage!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+
+                    if (resultIsError) ...[
+                      const SizedBox(height: 16),
+
+                      OutlinedButton.icon(
+                        onPressed: isProcessing ? null : retry,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
