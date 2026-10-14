@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/waste_collection_route.dart';
 import '../widgets/route_summary_card.dart';
 
 class RouteListScreen extends StatefulWidget {
@@ -10,46 +11,54 @@ class RouteListScreen extends StatefulWidget {
 }
 
 class _RouteListScreenState extends State<RouteListScreen> {
-  final List<Map<String, dynamic>> routes = [
-    {
-      'routeName': 'Route 01 - Vijay Nagar',
-      'driverName': 'Rahul',
-      'zonesDone': 8,
-      'zonesTotal': 10,
-      'status': 'In Progress',
-    },
-    {
-      'routeName': 'Route 02 - Palasia',
-      'driverName': 'Aman',
-      'zonesDone': 3,
-      'zonesTotal': 8,
-      'status': 'Delayed',
-    },
-    {
-      'routeName': 'Route 03 - Rau',
-      'driverName': 'Neha',
-      'zonesDone': 10,
-      'zonesTotal': 10,
-      'status': 'Completed',
-    },
-    {
-      'routeName': 'Route 04 - Arera Colony',
-      'driverName': 'Priya',
-      'zonesDone': 0,
-      'zonesTotal': 6,
-      'status': 'Missed',
-    },
+  final List<WasteCollectionRoute> routes = [
+    const WasteCollectionRoute(
+      id: 'route-01',
+      routeName: 'Route 01 - Vijay Nagar',
+      driverName: 'Rahul',
+      zonesDone: 8,
+      zonesTotal: 10,
+      status: 'In Progress',
+    ),
+    const WasteCollectionRoute(
+      id: 'route-02',
+      routeName: 'Route 02 - Palasia',
+      driverName: 'Aman',
+      zonesDone: 3,
+      zonesTotal: 8,
+      status: 'Delayed',
+    ),
+    const WasteCollectionRoute(
+      id: 'route-03',
+      routeName: 'Route 03 - Rau',
+      driverName: 'Neha',
+      zonesDone: 10,
+      zonesTotal: 10,
+      status: 'Completed',
+    ),
+    const WasteCollectionRoute(
+      id: 'route-04',
+      routeName: 'Route 04 - Arera Colony',
+      driverName: 'Priya',
+      zonesDone: 0,
+      zonesTotal: 6,
+      status: 'Missed',
+    ),
   ];
 
   void addSampleRoute() {
     setState(() {
-      routes.add({
-        'routeName': 'Route ${routes.length + 1}',
-        'driverName': 'New Driver',
-        'zonesDone': 0,
-        'zonesTotal': 5,
-        'status': 'In Progress',
-      });
+      final routeNumber = routes.length + 1;
+      routes.add(
+        WasteCollectionRoute(
+          id: 'route-${routeNumber.toString().padLeft(2, '0')}',
+          routeName: 'Route $routeNumber',
+          driverName: 'New Driver',
+          zonesDone: 0,
+          zonesTotal: 5,
+          status: 'In Progress',
+        ),
+      );
     });
   }
 
@@ -65,13 +74,7 @@ class _RouteListScreenState extends State<RouteListScreen> {
               itemBuilder: (context, index) {
                 final route = routes[index];
 
-                return RouteSummaryCard(
-                  routeName: route['routeName'] as String,
-                  driverName: route['driverName'] as String,
-                  zonesDone: route['zonesDone'] as int,
-                  zonesTotal: route['zonesTotal'] as int,
-                  status: route['status'] as String,
-                );
+                return RouteSummaryCard(route: route);
               },
             ),
       floatingActionButton: FloatingActionButton(
