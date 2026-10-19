@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "324991728390",
+    "project_id": "smartsweep-app-2026-ca059",
+    "storage_bucket": "smartsweep-app-2026-ca059.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324991728390:android:ee5b339e13b62d9dbe7c87",
+        "android_client_info": {
+          "package_name": "com.example.smart_sweep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324991728390-tuu6pj3ho9d4la034pdbpv2s6e736td9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDHz3r6lp26qR0p_pAlO56Za1piG4PriY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324991728390-tuu6pj3ho9d4la034pdbpv2s6e736td9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
