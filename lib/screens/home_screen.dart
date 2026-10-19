@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'firestore_test_screen.dart';
 import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
 
@@ -32,10 +33,30 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'SmartSweep',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.person_outline)),
+          // Firestore test button
+          IconButton(
+            tooltip: 'Firestore Test',
+            icon: const Icon(Icons.cloud_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const FirestoreTestScreen(),
+                ),
+              );
+            },
+          ),
+
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.person_outline),
+          ),
         ],
       ),
       body: pages[selectedIndex],
@@ -80,7 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
 class DashboardPage extends StatelessWidget {
   final VoidCallback onViewRoutes;
 
-  const DashboardPage({super.key, required this.onViewRoutes});
+  const DashboardPage({
+    super.key,
+    required this.onViewRoutes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -91,13 +115,21 @@ class DashboardPage extends StatelessWidget {
         children: [
           const Text(
             "Today's Overview",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+
           const SizedBox(height: 6),
+
           Text(
             'Monitor waste collection activity at a glance.',
-            style: TextStyle(color: Colors.grey.shade600),
+            style: TextStyle(
+              color: Colors.grey.shade600,
+            ),
           ),
+
           const SizedBox(height: 20),
 
           // KPI CARDS
@@ -140,8 +172,12 @@ class DashboardPage extends StatelessWidget {
 
           const Text(
             'Route Status',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+
           const SizedBox(height: 12),
 
           const RouteStatusCard(
@@ -150,12 +186,14 @@ class DashboardPage extends StatelessWidget {
             driver: 'Rahul',
             status: 'Active',
           ),
+
           const RouteStatusCard(
             route: 'Route 02',
             area: 'Palasia',
             driver: 'Aman',
             status: 'Pending',
           ),
+
           const RouteStatusCard(
             route: 'Route 03',
             area: 'Rau',
@@ -176,18 +214,25 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // LU 3.16: REPORT ISSUE FORM
+          // REPORT ISSUE FORM
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ReportIssueScreen()),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ReportIssueScreen(),
+                  ),
                 );
               },
-              icon: const Icon(Icons.report_problem_outlined),
-              label: const Text('Report an Issue'),
+              icon: const Icon(
+                Icons.report_problem_outlined,
+              ),
+              label: const Text(
+                'Report an Issue',
+              ),
             ),
           ),
         ],
@@ -223,17 +268,30 @@ class KpiCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(
+              icon,
+              color: color,
+              size: 28,
+            ),
+
             const SizedBox(height: 8),
+
             Text(
               value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+
             const SizedBox(height: 4),
+
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade700),
+              style: TextStyle(
+                color: Colors.grey.shade700,
+              ),
             ),
           ],
         ),
@@ -264,10 +322,13 @@ class RouteStatusCard extends StatelessWidget {
     switch (status) {
       case 'Active':
         return Colors.green;
+
       case 'Pending':
         return Colors.orange;
+
       case 'Completed':
         return Colors.blue;
+
       default:
         return Colors.grey;
     }
@@ -276,23 +337,43 @@ class RouteStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(
+        bottom: 10,
+      ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: statusColor.withAlpha(30),
-          child: Icon(Icons.local_shipping_outlined, color: statusColor),
+          backgroundColor:
+              statusColor.withAlpha(30),
+          child: Icon(
+            Icons.local_shipping_outlined,
+            color: statusColor,
+          ),
         ),
-        title: Text(route, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('$area • Driver: $driver'),
+        title: Text(
+          route,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          '$area • Driver: $driver',
+        ),
         trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
           decoration: BoxDecoration(
             color: statusColor.withAlpha(30),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius:
+                BorderRadius.circular(20),
           ),
           child: Text(
             status,
-            style: TextStyle(color: statusColor, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -327,21 +408,41 @@ class AlertsPage extends StatelessWidget {
       children: const [
         Text(
           'Alerts',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 16),
-        Card(
-          child: ListTile(
-            leading: Icon(Icons.warning_amber, color: Colors.orange),
-            title: Text('Collection pending'),
-            subtitle: Text('Route 02 • Palasia'),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
         ),
+
+        SizedBox(height: 16),
+
         Card(
           child: ListTile(
-            leading: Icon(Icons.notifications_active, color: Colors.red),
-            title: Text('Collection alert'),
-            subtitle: Text('Review the reported collection issue.'),
+            leading: Icon(
+              Icons.warning_amber,
+              color: Colors.orange,
+            ),
+            title: Text(
+              'Collection pending',
+            ),
+            subtitle: Text(
+              'Route 02 • Palasia',
+            ),
+          ),
+        ),
+
+        Card(
+          child: ListTile(
+            leading: Icon(
+              Icons.notifications_active,
+              color: Colors.red,
+            ),
+            title: Text(
+              'Collection alert',
+            ),
+            subtitle: Text(
+              'Review the reported collection issue.',
+            ),
           ),
         ),
       ],
@@ -363,14 +464,26 @@ class ReportsPage extends StatelessWidget {
       children: const [
         Text(
           'Reports',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+
         SizedBox(height: 16),
+
         Card(
           child: ListTile(
-            leading: Icon(Icons.assessment_outlined, color: Colors.green),
-            title: Text('Collection Summary'),
-            subtitle: Text('View waste collection activity.'),
+            leading: Icon(
+              Icons.assessment_outlined,
+              color: Colors.green,
+            ),
+            title: Text(
+              'Collection Summary',
+            ),
+            subtitle: Text(
+              'View waste collection activity.',
+            ),
           ),
         ),
       ],
