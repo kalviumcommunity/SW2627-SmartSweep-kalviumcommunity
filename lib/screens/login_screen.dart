@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,15 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Task 2: Firebase verifies the credentials
+      // Firebase verifies the credentials.
+      // No manual navigation: AuthGate listens to authStateChanges
+      // and swaps this screen for the dashboard on success.
       await _auth.signIn(_email.text, _password.text);
-
-      if (!mounted) return;
-      // Task 3: redirect on success; pushReplacement removes login from the back stack
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
-      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       setState(() => errorMessage = _safeMessage(e));
