@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'add_issue_record_screen.dart';
+import 'fetch_reported_issues_screen.dart';
 import 'firestore_test_screen.dart';
 import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
@@ -278,6 +279,21 @@ class DashboardPage extends StatelessWidget {
                 'Add Issue to Firestore',
               ),
             ),
+          ),
+
+          const SizedBox(height: 12),
+
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FetchReportedIssuesScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.list_alt_outlined),
+            label: const Text('View Reported Issues'),
           ),
         ],
       ),
