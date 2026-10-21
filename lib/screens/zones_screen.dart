@@ -77,7 +77,7 @@ class _ZonesScreenState extends State<ZonesScreen> {
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             itemCount: zones.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final z = zones[i];
               final color = z.hasRecurringMisses ? Colors.red.shade700 : Colors.green.shade700;
