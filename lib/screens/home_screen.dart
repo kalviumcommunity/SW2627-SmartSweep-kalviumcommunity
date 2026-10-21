@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'add_issue_record_screen.dart';
 import 'firestore_test_screen.dart';
 import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
@@ -38,7 +39,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // Firestore test button
+          // NEW: Add Firestore Record
+          IconButton(
+            tooltip: 'Add Firestore Record',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const AddIssueRecordScreen(),
+                ),
+              );
+            },
+          ),
+
+          // Previous Firestore connection test screen
           IconButton(
             tooltip: 'Firestore Test',
             icon: const Icon(Icons.cloud_outlined),
@@ -53,13 +69,17 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
+          // Existing profile button
           IconButton(
+            tooltip: 'Profile',
             onPressed: () {},
             icon: const Icon(Icons.person_outline),
           ),
         ],
       ),
+
       body: pages[selectedIndex],
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) {
@@ -214,7 +234,7 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // REPORT ISSUE FORM
+          // Existing report issue form
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -232,6 +252,30 @@ class DashboardPage extends StatelessWidget {
               ),
               label: const Text(
                 'Report an Issue',
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // NEW: Add issue directly to Firestore
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const AddIssueRecordScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.cloud_upload_outlined,
+              ),
+              label: const Text(
+                'Add Issue to Firestore',
               ),
             ),
           ),
