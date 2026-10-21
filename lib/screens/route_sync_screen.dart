@@ -18,6 +18,7 @@ class _RouteSyncScreenState extends State<RouteSyncScreen> {
   @override
   void dispose() {
     routeNumberController.dispose();
+
     super.dispose();
   }
 
