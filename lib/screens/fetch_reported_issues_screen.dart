@@ -14,6 +14,7 @@ class FetchReportedIssuesScreen extends StatefulWidget {
 class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   late Future<List<Map<String, dynamic>>> _issuesFuture;
+  final Set<String> _deletingIssueIds = <String>{};
 
   @override
   void initState() {
@@ -25,6 +26,50 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
     setState(() {
       _issuesFuture = _firestoreService.fetchReportedIssues();
     });
+  }
+
+  Future<void> _deleteIssue(String id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete reported issue?'),
+        content: const Text('This issue will be permanently deleted.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true || _deletingIssueIds.contains(id)) return;
+
+    setState(() => _deletingIssueIds.add(id));
+    try {
+      await _firestoreService.deleteReportedIssue(id);
+      if (!mounted) return;
+
+      setState(() {
+        _deletingIssueIds.remove(id);
+        _issuesFuture = _firestoreService.fetchReportedIssues();
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Reported issue deleted.')));
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() => _deletingIssueIds.remove(id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not delete reported issue. Please try again.'),
+        ),
+      );
+    }
   }
 
   DateTime? _createdAt(Map<String, dynamic> issue) {
@@ -42,6 +87,8 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
   }
 
   Widget _buildIssueCard(BuildContext context, Map<String, dynamic> issue) {
+    final issueId = issue['id']?.toString() ?? '';
+    final isDeleting = _deletingIssueIds.contains(issueId);
     final isUrgent = issue['isUrgent'] == true;
     final createdAt = _createdAt(issue)?.toLocal();
     final createdAtText = createdAt == null
@@ -81,6 +128,19 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
           ),
         ),
         isThreeLine: true,
+        trailing: IconButton(
+          tooltip: 'Delete reported issue',
+          onPressed: issueId.isEmpty || isDeleting
+              ? null
+              : () => _deleteIssue(issueId),
+          icon: isDeleting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.delete_outline),
+        ),
       ),
     );
   }

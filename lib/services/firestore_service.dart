@@ -45,6 +45,10 @@ class FirestoreService {
     return document.id;
   }
 
+  Future<void> deleteReportedIssue(String id) async {
+    await _firestore.collection('reported_issues').doc(id).delete();
+  }
+
   Future<List<Map<String, dynamic>>> fetchReportedIssues() async {
     final snapshot = await _firestore.collection('reported_issues').get();
     final issues = snapshot.docs
