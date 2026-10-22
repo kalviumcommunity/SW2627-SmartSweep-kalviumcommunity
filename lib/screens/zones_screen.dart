@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/zone.dart';
 import '../services/zone_service.dart';
+import 'edit_zone_screen.dart';
 
 class ZonesScreen extends StatefulWidget {
   const ZonesScreen({super.key});
@@ -32,14 +33,25 @@ class _ZonesScreenState extends State<ZonesScreen> {
     }
   }
 
+  Future<void> _openEdit(Zone zone) async {
+    final updated = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => EditZoneScreen(zone: zone)),
+    );
+    if (updated == true && mounted) _snack('Zone updated');
+  }
+
   Future<void> _onAction(String action, Zone zone) async {
     try {
       switch (action) {
+        case 'edit':
+          await _openEdit(zone);
+          break;
         case 'missed':
-          await _service.updateZone(zone.copyWith(missedCount: zone.missedCount + 1));
+          await _service.recordMissed(zone.id); // update(): only missedCount
           break;
         case 'serviced':
-          await _service.updateZone(zone.copyWith(lastServicedAt: DateTime.now()));
+          await _service.markServiced(zone.id); // update(): only lastServicedAt
           break;
         case 'delete':
           await _service.deleteZone(zone.id);
@@ -80,14 +92,22 @@ class _ZonesScreenState extends State<ZonesScreen> {
             separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final z = zones[i];
-              final color = z.hasRecurringMisses ? Colors.red.shade700 : Colors.green.shade700;
+              final color = !z.isActive
+                  ? Colors.blueGrey
+                  : z.hasRecurringMisses
+                      ? Colors.red.shade700
+                      : Colors.green.shade700;
               return Card(
                 child: ListTile(
+                  onTap: () => _openEdit(z), // Task 2: the tapped zone carries its id
                   leading: CircleAvatar(
                     backgroundColor: color.withAlpha(30),
                     child: Icon(Icons.location_city, color: color),
                   ),
-                  title: Text(z.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  title: Text(
+                    '${z.name}${z.isActive ? '' : '  (inactive)'}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   subtitle: Text(
                     '${z.area} | ${z.scheduleDay}\n'
                     'Missed: ${z.missedCount}'
@@ -98,6 +118,7 @@ class _ZonesScreenState extends State<ZonesScreen> {
                   trailing: PopupMenuButton<String>(
                     onSelected: (a) => _onAction(a, z),
                     itemBuilder: (_) => const [
+                      PopupMenuItem(value: 'edit', child: Text('Edit details')),
                       PopupMenuItem(value: 'missed', child: Text('Record missed collection')),
                       PopupMenuItem(value: 'serviced', child: Text('Mark serviced now')),
                       PopupMenuItem(value: 'delete', child: Text('Delete')),

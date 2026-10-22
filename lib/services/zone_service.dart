@@ -21,15 +21,26 @@ class ZoneService {
         .map((snap) => snap.docs.map((d) => d.data()).toList());
   }
 
-  /// Write: create (Firestore generates the id)
+  /// Create (Firestore generates the id)
   Future<void> addZone(Zone zone) async {
     await _zones.add(zone);
   }
 
-  /// Write: update the existing document using the model's id
-  Future<void> updateZone(Zone zone) async {
-    await _zones.doc(zone.id).set(zone);
+  /// Task 1 + 2 + 3: update ONLY the given fields on the document with this id.
+  /// Every field not in [fields] is left exactly as it is.
+  /// Throws FirebaseException(code: 'not-found') if the document no longer exists.
+  Future<void> updateZoneFields(String id, Map<String, Object?> fields) async {
+    if (fields.isEmpty) return;
+    await _db.collection(collection).doc(id).update(fields);
   }
+
+  /// Changes just missedCount, atomically on the server
+  Future<void> recordMissed(String id) =>
+      updateZoneFields(id, {'missedCount': FieldValue.increment(1)});
+
+  /// Changes just lastServicedAt
+  Future<void> markServiced(String id) =>
+      updateZoneFields(id, {'lastServicedAt': Timestamp.now()});
 
   Future<void> deleteZone(String id) async {
     await _zones.doc(id).delete();
