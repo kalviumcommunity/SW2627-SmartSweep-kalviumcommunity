@@ -46,16 +46,18 @@ class FirestoreService {
     return document.id;
   }
 
-  // NEW: Firestore query using where()
-  Future<List<Map<String, dynamic>>>
-      getReportedIssuesByUrgency({
-    required bool isUrgent,
-  }) async {
-    final snapshot = await _firestore
-        .collection('reported_issues')
-        .where(
-          'isUrgent',
-          isEqualTo: isUrgent,
+  Future<void> deleteReportedIssue(String id) async {
+    await _firestore.collection('reported_issues').doc(id).delete();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchReportedIssues() async {
+    final snapshot = await _firestore.collection('reported_issues').get();
+    final issues = snapshot.docs
+        .map(
+          (document) => <String, dynamic>{
+            ...document.data(),
+            'id': document.id,
+          },
         )
         .get();
 
