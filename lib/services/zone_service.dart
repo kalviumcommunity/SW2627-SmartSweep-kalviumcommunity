@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../models/zone.dart';
 
 class ZoneService {
@@ -8,7 +9,9 @@ class ZoneService {
   final FirebaseFirestore _db;
 
   /// A typed collection: reads give Zone, writes accept Zone.
-  CollectionReference<Zone> get _zones => _db.collection(collection).withConverter<Zone>(
+  CollectionReference<Zone> get _zones => _db
+      .collection(collection)
+      .withConverter<Zone>(
         fromFirestore: (snap, options) => Zone.fromFirestore(snap, options),
         toFirestore: (zone, _) => zone.toFirestore(),
       );
@@ -35,13 +38,19 @@ class ZoneService {
 
   /// Create (Firestore generates the id)
   Future<void> addZone(Zone zone) async {
-    await _zones.add(zone);
+    await _db.collection(collection).add({
+      ...zone.toFirestore(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   /// Update ONLY the given fields on the document with this id.
   Future<void> updateZoneFields(String id, Map<String, Object?> fields) async {
     if (fields.isEmpty) return;
-    await _db.collection(collection).doc(id).update(fields);
+    await _db.collection(collection).doc(id).update({
+      ...fields,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<void> recordMissed(String id) =>
