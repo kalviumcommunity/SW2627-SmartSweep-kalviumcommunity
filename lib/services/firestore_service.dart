@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addConnectionTest() async {
     await _firestore.collection('connection_tests').add({
@@ -24,8 +23,7 @@ class FirestoreService {
 
     final data = snapshot.docs.first.data();
 
-    return data['message']?.toString() ??
-        'Firestore record found.';
+    return data['message']?.toString() ?? 'Firestore record found.';
   }
 
   Future<String> addReportedIssue({
@@ -34,8 +32,7 @@ class FirestoreService {
     required String issueDescription,
     required bool isUrgent,
   }) async {
-    final document =
-        await _firestore.collection('reported_issues').add({
+    final document = await _firestore.collection('reported_issues').add({
       'driverName': driverName,
       'phoneNumber': phoneNumber,
       'issueDescription': issueDescription,
@@ -52,22 +49,31 @@ class FirestoreService {
 
   Future<List<Map<String, dynamic>>> fetchReportedIssues() async {
     final snapshot = await _firestore.collection('reported_issues').get();
-    final issues = snapshot.docs
+    return snapshot.docs
         .map(
           (document) => <String, dynamic>{
             ...document.data(),
             'id': document.id,
           },
         )
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getReportedIssuesByUrgency({
+    required bool isUrgent,
+  }) async {
+    final snapshot = await _firestore
+        .collection('reported_issues')
+        .where('isUrgent', isEqualTo: isUrgent)
         .get();
 
-    return snapshot.docs.map((document) {
-      final data = document.data();
-
-      return {
-        'id': document.id,
-        ...data,
-      };
-    }).toList();
+    return snapshot.docs
+        .map(
+          (document) => <String, dynamic>{
+            ...document.data(),
+            'id': document.id,
+          },
+        )
+        .toList();
   }
 }
