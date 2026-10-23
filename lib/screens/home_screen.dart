@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'add_issue_record_screen.dart';
 import 'fetch_reported_issues_screen.dart';
+import 'filtered_issues_screen.dart';
 import 'firestore_test_screen.dart';
 import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
@@ -40,10 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // NEW: Add Firestore Record
+          // Add Firestore Record
           IconButton(
             tooltip: 'Add Firestore Record',
-            icon: const Icon(Icons.add_circle_outline),
+            icon: const Icon(
+              Icons.add_circle_outline,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -55,10 +58,29 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // Previous Firestore connection test screen
+          // NEW: Filtered Firestore Query
+          IconButton(
+            tooltip: 'Filter Reported Issues',
+            icon: const Icon(
+              Icons.filter_alt_outlined,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const FilteredIssuesScreen(),
+                ),
+              );
+            },
+          ),
+
+          // Firestore Test
           IconButton(
             tooltip: 'Firestore Test',
-            icon: const Icon(Icons.cloud_outlined),
+            icon: const Icon(
+              Icons.cloud_outlined,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -70,11 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // Existing profile button
+          // Profile
           IconButton(
             tooltip: 'Profile',
             onPressed: () {},
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(
+              Icons.person_outline,
+            ),
           ),
         ],
       ),
@@ -90,23 +114,39 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
+            icon: Icon(
+              Icons.dashboard_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.dashboard,
+            ),
             label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(Icons.route_outlined),
-            selectedIcon: Icon(Icons.route),
+            icon: Icon(
+              Icons.route_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.route,
+            ),
             label: 'Routes',
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
+            icon: Icon(
+              Icons.notifications_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.notifications,
+            ),
             label: 'Alerts',
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
+            icon: Icon(
+              Icons.bar_chart_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.bar_chart,
+            ),
             label: 'Reports',
           ),
         ],
@@ -132,7 +172,8 @@ class DashboardPage extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           const Text(
             "Today's Overview",
@@ -157,7 +198,8 @@ class DashboardPage extends StatelessWidget {
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics:
+                const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1.5,
@@ -224,18 +266,23 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
+          // View All Routes
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onViewRoutes,
-              icon: const Icon(Icons.route),
-              label: const Text('View All Routes'),
+              icon: const Icon(
+                Icons.route,
+              ),
+              label: const Text(
+                'View All Routes',
+              ),
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // Existing report issue form
+          // Report Issue
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -259,7 +306,7 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // NEW: Add issue directly to Firestore
+          // Add Firestore Record
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -283,18 +330,53 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          OutlinedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const FetchReportedIssuesScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.list_alt_outlined),
-            label: const Text('View Reported Issues'),
+          // View all reported issues
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const FetchReportedIssuesScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.list_alt_outlined,
+              ),
+              label: const Text(
+                'View Reported Issues',
+              ),
+            ),
           ),
+
+          const SizedBox(height: 12),
+
+          // NEW: Firestore Query Filter
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const FilteredIssuesScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.filter_alt_outlined,
+              ),
+              label: const Text(
+                'Filter Reported Issues',
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -326,7 +408,8 @@ class KpiCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
             Icon(
               icon,
@@ -419,12 +502,14 @@ class RouteStatusCard extends StatelessWidget {
           '$area • Driver: $driver',
         ),
         trailing: Container(
-          padding: const EdgeInsets.symmetric(
+          padding:
+              const EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 6,
           ),
           decoration: BoxDecoration(
-            color: statusColor.withAlpha(30),
+            color:
+                statusColor.withAlpha(30),
             borderRadius:
                 BorderRadius.circular(20),
           ),
@@ -432,7 +517,8 @@ class RouteStatusCard extends StatelessWidget {
             status,
             style: TextStyle(
               color: statusColor,
-              fontWeight: FontWeight.w600,
+              fontWeight:
+                  FontWeight.w600,
             ),
           ),
         ),
