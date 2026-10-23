@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'live_zones_screen.dart';
 import 'zones_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -32,7 +33,6 @@ class DashboardScreen extends StatelessWidget {
     navigator.popUntil((route) => route.isFirst);
 
     try {
-      // Ends the Firebase session (wrapper around FirebaseAuth.instance.signOut())
       await AuthService().signOut();
       // No Navigator call: AuthGate sees the null user and shows the login screen
     } catch (_) {
@@ -69,6 +69,15 @@ class DashboardScreen extends StatelessWidget {
             Text(user?.email ?? 'Unknown user'),
             const SizedBox(height: 24),
             FilledButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LiveZonesScreen()),
+              ),
+              icon: const Icon(Icons.sensors),
+              label: const Text('Live zone monitor'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.tonalIcon(
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ZonesScreen()),
