@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../services/firestore_service.dart';
+import '../widgets/reported_issue_image.dart';
 
 class FilteredIssuesScreen extends StatefulWidget {
   const FilteredIssuesScreen({super.key});
 
   @override
-  State<FilteredIssuesScreen> createState() =>
-      _FilteredIssuesScreenState();
+  State<FilteredIssuesScreen> createState() => _FilteredIssuesScreenState();
 }
 
-class _FilteredIssuesScreenState
-    extends State<FilteredIssuesScreen> {
-  final FirestoreService _firestoreService =
-      FirestoreService();
+class _FilteredIssuesScreenState extends State<FilteredIssuesScreen> {
+  final FirestoreService _firestoreService = FirestoreService();
 
   bool _showUrgent = true;
   bool _isLoading = false;
@@ -35,8 +33,7 @@ class _FilteredIssuesScreenState
     });
 
     try {
-      final results =
-          await _firestoreService.getReportedIssuesByUrgency(
+      final results = await _firestoreService.getReportedIssuesByUrgency(
         isUrgent: _showUrgent,
       );
 
@@ -50,8 +47,7 @@ class _FilteredIssuesScreenState
 
       setState(() {
         _issues = [];
-        _errorMessage =
-            'Unable to load filtered issues. Please try again.';
+        _errorMessage = 'Unable to load filtered issues. Please try again.';
       });
     } finally {
       if (mounted) {
@@ -77,11 +73,7 @@ class _FilteredIssuesScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Filtered Firestore Issues',
-        ),
-      ),
+      appBar: AppBar(title: const Text('Filtered Firestore Issues')),
       body: RefreshIndicator(
         onRefresh: _loadFilteredIssues,
         child: ListView(
@@ -89,10 +81,7 @@ class _FilteredIssuesScreenState
           children: [
             const Text(
               'Firestore Query',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
@@ -108,9 +97,7 @@ class _FilteredIssuesScreenState
               children: [
                 Expanded(
                   child: ChoiceChip(
-                    label: const Text(
-                      'Urgent Issues',
-                    ),
+                    label: const Text('Urgent Issues'),
                     selected: _showUrgent,
                     onSelected: (_) {
                       _changeFilter(true);
@@ -122,9 +109,7 @@ class _FilteredIssuesScreenState
 
                 Expanded(
                   child: ChoiceChip(
-                    label: const Text(
-                      'Normal Issues',
-                    ),
+                    label: const Text('Normal Issues'),
                     selected: !_showUrgent,
                     onSelected: (_) {
                       _changeFilter(false);
@@ -137,13 +122,8 @@ class _FilteredIssuesScreenState
             const SizedBox(height: 24),
 
             Text(
-              _showUrgent
-                  ? 'Urgent Issues'
-                  : 'Normal Issues',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              _showUrgent ? 'Urgent Issues' : 'Normal Issues',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 12),
@@ -151,9 +131,7 @@ class _FilteredIssuesScreenState
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.all(30),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: Center(child: CircularProgressIndicator()),
               )
             else if (_errorMessage != null)
               Card(
@@ -161,15 +139,9 @@ class _FilteredIssuesScreenState
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 50,
-                      ),
+                      const Icon(Icons.error_outline, size: 50),
                       const SizedBox(height: 12),
-                      Text(
-                        _errorMessage!,
-                        textAlign: TextAlign.center,
-                      ),
+                      Text(_errorMessage!, textAlign: TextAlign.center),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _loadFilteredIssues,
@@ -185,10 +157,7 @@ class _FilteredIssuesScreenState
                   padding: const EdgeInsets.all(30),
                   child: Column(
                     children: [
-                      const Icon(
-                        Icons.search_off,
-                        size: 60,
-                      ),
+                      const Icon(Icons.search_off, size: 60),
                       const SizedBox(height: 12),
                       Text(
                         _showUrgent
@@ -211,72 +180,67 @@ class _FilteredIssuesScreenState
                 ),
               )
             else
-              ..._issues.map(
-                (issue) {
-                  final driverName =
-                      issue['driverName']?.toString() ??
-                          'Unknown Driver';
+              ..._issues.map((issue) {
+                final driverName =
+                    issue['driverName']?.toString() ?? 'Unknown Driver';
 
-                  final phoneNumber =
-                      issue['phoneNumber']?.toString() ??
-                          'No phone number';
+                final phoneNumber =
+                    issue['phoneNumber']?.toString() ?? 'No phone number';
 
-                  final description =
-                      issue['issueDescription']
-                              ?.toString() ??
-                          'No description';
+                final description =
+                    issue['issueDescription']?.toString() ?? 'No description';
 
-                  final urgent =
-                      issue['isUrgent'] == true;
+                final urgent = issue['isUrgent'] == true;
 
-                  return Card(
-                    margin:
-                        const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(
-                          urgent
-                              ? Icons.warning_amber
-                              : Icons.check_circle_outline,
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          child: Icon(
+                            urgent
+                                ? Icons.warning_amber
+                                : Icons.check_circle_outline,
+                          ),
+                        ),
+                        title: Text(
+                          driverName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          '$description\n'
+                          'Phone: $phoneNumber',
+                        ),
+                        isThreeLine: true,
+                        trailing: Text(
+                          urgent ? 'Urgent' : 'Normal',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: urgent ? Colors.red : Colors.green,
+                          ),
                         ),
                       ),
-                      title: Text(
-                        driverName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                      if (issue['imageUrl'] is String &&
+                          (issue['imageUrl'] as String).isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: ReportedIssueImage(
+                            imageUrl: issue['imageUrl'] as String,
+                          ),
                         ),
-                      ),
-                      subtitle: Text(
-                        '$description\n'
-                        'Phone: $phoneNumber',
-                      ),
-                      isThreeLine: true,
-                      trailing: Text(
-                        urgent
-                            ? 'Urgent'
-                            : 'Normal',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: urgent
-                              ? Colors.red
-                              : Colors.green,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                    ],
+                  ),
+                );
+              }),
 
             const SizedBox(height: 20),
 
             OutlinedButton.icon(
-              onPressed: _isLoading
-                  ? null
-                  : _loadFilteredIssues,
+              onPressed: _isLoading ? null : _loadFilteredIssues,
               icon: const Icon(Icons.refresh),
-              label: const Text(
-                'Refresh Query',
-              ),
+              label: const Text('Refresh Query'),
             ),
           ],
         ),
