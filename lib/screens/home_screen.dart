@@ -4,7 +4,6 @@ import 'add_issue_record_screen.dart';
 import 'fetch_reported_issues_screen.dart';
 import 'filtered_issues_screen.dart';
 import 'firestore_test_screen.dart';
-import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,23 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'SmartSweep',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           // Add Firestore Record
           IconButton(
             tooltip: 'Add Firestore Record',
-            icon: const Icon(
-              Icons.add_circle_outline,
-            ),
+            icon: const Icon(Icons.add_circle_outline),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const AddIssueRecordScreen(),
+                  builder: (context) => const AddIssueRecordScreen(),
                 ),
               );
             },
@@ -61,15 +55,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // NEW: Filtered Firestore Query
           IconButton(
             tooltip: 'Filter Reported Issues',
-            icon: const Icon(
-              Icons.filter_alt_outlined,
-            ),
+            icon: const Icon(Icons.filter_alt_outlined),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const FilteredIssuesScreen(),
+                  builder: (context) => const FilteredIssuesScreen(),
                 ),
               );
             },
@@ -78,15 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // Firestore Test
           IconButton(
             tooltip: 'Firestore Test',
-            icon: const Icon(
-              Icons.cloud_outlined,
-            ),
+            icon: const Icon(Icons.cloud_outlined),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const FirestoreTestScreen(),
+                  builder: (context) => const FirestoreTestScreen(),
                 ),
               );
             },
@@ -96,9 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             tooltip: 'Profile',
             onPressed: () {},
-            icon: const Icon(
-              Icons.person_outline,
-            ),
+            icon: const Icon(Icons.person_outline),
           ),
         ],
       ),
@@ -114,39 +100,23 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(
-              Icons.dashboard_outlined,
-            ),
-            selectedIcon: Icon(
-              Icons.dashboard,
-            ),
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(
-              Icons.route_outlined,
-            ),
-            selectedIcon: Icon(
-              Icons.route,
-            ),
+            icon: Icon(Icons.route_outlined),
+            selectedIcon: Icon(Icons.route),
             label: 'Routes',
           ),
           NavigationDestination(
-            icon: Icon(
-              Icons.notifications_outlined,
-            ),
-            selectedIcon: Icon(
-              Icons.notifications,
-            ),
+            icon: Icon(Icons.notifications_outlined),
+            selectedIcon: Icon(Icons.notifications),
             label: 'Alerts',
           ),
           NavigationDestination(
-            icon: Icon(
-              Icons.bar_chart_outlined,
-            ),
-            selectedIcon: Icon(
-              Icons.bar_chart,
-            ),
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
             label: 'Reports',
           ),
         ],
@@ -162,34 +132,25 @@ class _HomeScreenState extends State<HomeScreen> {
 class DashboardPage extends StatelessWidget {
   final VoidCallback onViewRoutes;
 
-  const DashboardPage({
-    super.key,
-    required this.onViewRoutes,
-  });
+  const DashboardPage({super.key, required this.onViewRoutes});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Today's Overview",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 6),
 
           Text(
             'Monitor waste collection activity at a glance.',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(color: Colors.grey.shade600),
           ),
 
           const SizedBox(height: 20),
@@ -198,8 +159,7 @@ class DashboardPage extends StatelessWidget {
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics:
-                const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1.5,
@@ -235,10 +195,7 @@ class DashboardPage extends StatelessWidget {
 
           const Text(
             'Route Status',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 12),
@@ -271,12 +228,8 @@ class DashboardPage extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onViewRoutes,
-              icon: const Icon(
-                Icons.route,
-              ),
-              label: const Text(
-                'View All Routes',
-              ),
+              icon: const Icon(Icons.route),
+              label: const Text('View All Routes'),
             ),
           ),
 
@@ -290,17 +243,12 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        const ReportIssueScreen(),
+                    builder: (_) => const AddIssueRecordScreen(),
                   ),
                 );
               },
-              icon: const Icon(
-                Icons.report_problem_outlined,
-              ),
-              label: const Text(
-                'Report an Issue',
-              ),
+              icon: const Icon(Icons.report_problem_outlined),
+              label: const Text('Report an Issue'),
             ),
           ),
 
@@ -314,17 +262,12 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        const AddIssueRecordScreen(),
+                    builder: (_) => const AddIssueRecordScreen(),
                   ),
                 );
               },
-              icon: const Icon(
-                Icons.cloud_upload_outlined,
-              ),
-              label: const Text(
-                'Add Issue to Firestore',
-              ),
+              icon: const Icon(Icons.cloud_upload_outlined),
+              label: const Text('Add Issue to Firestore'),
             ),
           ),
 
@@ -338,17 +281,12 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        const FetchReportedIssuesScreen(),
+                    builder: (_) => const FetchReportedIssuesScreen(),
                   ),
                 );
               },
-              icon: const Icon(
-                Icons.list_alt_outlined,
-              ),
-              label: const Text(
-                'View Reported Issues',
-              ),
+              icon: const Icon(Icons.list_alt_outlined),
+              label: const Text('View Reported Issues'),
             ),
           ),
 
@@ -362,17 +300,12 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        const FilteredIssuesScreen(),
+                    builder: (_) => const FilteredIssuesScreen(),
                   ),
                 );
               },
-              icon: const Icon(
-                Icons.filter_alt_outlined,
-              ),
-              label: const Text(
-                'Filter Reported Issues',
-              ),
+              icon: const Icon(Icons.filter_alt_outlined),
+              label: const Text('Filter Reported Issues'),
             ),
           ),
 
@@ -408,23 +341,15 @@ class KpiCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+            Icon(icon, color: color, size: 28),
 
             const SizedBox(height: 8),
 
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 4),
@@ -432,9 +357,7 @@ class KpiCard extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey.shade700,
-              ),
+              style: TextStyle(color: Colors.grey.shade700),
             ),
           ],
         ),
@@ -480,46 +403,23 @@ class RouteStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(
-        bottom: 10,
-      ),
+      margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor:
-              statusColor.withAlpha(30),
-          child: Icon(
-            Icons.local_shipping_outlined,
-            color: statusColor,
-          ),
+          backgroundColor: statusColor.withAlpha(30),
+          child: Icon(Icons.local_shipping_outlined, color: statusColor),
         ),
-        title: Text(
-          route,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          '$area • Driver: $driver',
-        ),
+        title: Text(route, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('$area • Driver: $driver'),
         trailing: Container(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color:
-                statusColor.withAlpha(30),
-            borderRadius:
-                BorderRadius.circular(20),
+            color: statusColor.withAlpha(30),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             status,
-            style: TextStyle(
-              color: statusColor,
-              fontWeight:
-                  FontWeight.w600,
-            ),
+            style: TextStyle(color: statusColor, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -554,41 +454,24 @@ class AlertsPage extends StatelessWidget {
       children: const [
         Text(
           'Alerts',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
 
         SizedBox(height: 16),
 
         Card(
           child: ListTile(
-            leading: Icon(
-              Icons.warning_amber,
-              color: Colors.orange,
-            ),
-            title: Text(
-              'Collection pending',
-            ),
-            subtitle: Text(
-              'Route 02 • Palasia',
-            ),
+            leading: Icon(Icons.warning_amber, color: Colors.orange),
+            title: Text('Collection pending'),
+            subtitle: Text('Route 02 • Palasia'),
           ),
         ),
 
         Card(
           child: ListTile(
-            leading: Icon(
-              Icons.notifications_active,
-              color: Colors.red,
-            ),
-            title: Text(
-              'Collection alert',
-            ),
-            subtitle: Text(
-              'Review the reported collection issue.',
-            ),
+            leading: Icon(Icons.notifications_active, color: Colors.red),
+            title: Text('Collection alert'),
+            subtitle: Text('Review the reported collection issue.'),
           ),
         ),
       ],
@@ -610,26 +493,16 @@ class ReportsPage extends StatelessWidget {
       children: const [
         Text(
           'Reports',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
 
         SizedBox(height: 16),
 
         Card(
           child: ListTile(
-            leading: Icon(
-              Icons.assessment_outlined,
-              color: Colors.green,
-            ),
-            title: Text(
-              'Collection Summary',
-            ),
-            subtitle: Text(
-              'View waste collection activity.',
-            ),
+            leading: Icon(Icons.assessment_outlined, color: Colors.green),
+            title: Text('Collection Summary'),
+            subtitle: Text('View waste collection activity.'),
           ),
         ),
       ],
