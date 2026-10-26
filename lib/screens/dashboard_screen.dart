@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'live_zones_screen.dart';
+import 'storage_status_screen.dart';
 import 'zones_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -58,40 +59,52 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.verified_user, size: 64, color: Colors.green.shade700),
-            const SizedBox(height: 16),
-            Text('Protected dashboard',
-                style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(user?.email ?? 'Unknown user'),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LiveZonesScreen()),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.verified_user, size: 64, color: Colors.green.shade700),
+              const SizedBox(height: 16),
+              Text('Protected dashboard',
+                  style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: 8),
+              Text(user?.email ?? 'Unknown user'),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LiveZonesScreen()),
+                ),
+                icon: const Icon(Icons.sensors),
+                label: const Text('Live zone monitor'),
               ),
-              icon: const Icon(Icons.sensors),
-              label: const Text('Live zone monitor'),
-            ),
-            const SizedBox(height: 12),
-            FilledButton.tonalIcon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ZonesScreen()),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ZonesScreen()),
+                ),
+                icon: const Icon(Icons.location_city),
+                label: const Text('Manage zones'),
               ),
-              icon: const Icon(Icons.location_city),
-              label: const Text('Manage zones'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () => _logout(context),
-              icon: const Icon(Icons.logout),
-              label: const Text('Log out'),
-            ),
-          ],
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StorageStatusScreen()),
+                ),
+                icon: const Icon(Icons.cloud_upload),
+                label: const Text('Storage connection'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => _logout(context),
+                icon: const Icon(Icons.logout),
+                label: const Text('Log out'),
+              ),
+            ],
+          ),
         ),
       ),
     );
