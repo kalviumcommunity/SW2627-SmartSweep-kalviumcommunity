@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
-import 'main_shell.dart';
+import 'home_screen.dart';
 
 /// Single source of truth for "is the user allowed in?".
 /// Rebuilds automatically whenever Firebase's auth state changes.

@@ -33,8 +33,10 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete reported issue?'),
-        content: const Text('This issue will be permanently deleted.'),
+        title: const Text('Delete issue?'),
+        content: const Text(
+          'Are you sure you want to delete this issue? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -61,14 +63,24 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Reported issue deleted.')));
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
+
+      setState(() => _deletingIssueIds.remove(id));
+      final message = switch (error.code) {
+        'permission-denied' => 'You do not have permission to delete this issue.',
+        'unavailable' => 'No connection. Check your network and try again.',
+        _ => 'Could not delete the issue. Please try again.',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     } catch (_) {
       if (!mounted) return;
 
       setState(() => _deletingIssueIds.remove(id));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not delete reported issue. Please try again.'),
-        ),
+        const SnackBar(content: Text('Could not delete the issue. Please try again.')),
       );
     }
   }

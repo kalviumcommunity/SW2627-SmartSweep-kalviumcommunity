@@ -97,15 +97,54 @@ class _LiveZonesScreenState extends State<LiveZonesScreen> {
         scheduleDay: 'Monday',
         createdAt: now,
       ));
+      if (mounted) _snack('Test zone added.');
     } catch (_) {
       if (mounted) _snack('Could not add zone.');
     }
   }
 
   Future<void> _onAction(String action, Zone zone) async {
+    if (action == 'delete') {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Delete issue?'),
+          content: const Text(
+            'Are you sure you want to delete this issue? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmed != true) return;
+    }
+
     try {
-      if (action == 'missed') await _service.recordMissed(zone.id);
-      if (action == 'delete') await _service.deleteZone(zone.id);
+      if (action == 'missed') {
+        await _service.recordMissed(zone.id);
+        if (mounted) _snack('Missed collection recorded.');
+      }
+      if (action == 'delete') {
+        await _service.deleteZone(zone.id);
+        if (mounted) _snack('Record deleted.');
+      }
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
+      final message = switch (error.code) {
+        'permission-denied' => 'You do not have permission to update this record.',
+        'unavailable' => 'No connection. Check your network and try again.',
+        'not-found' => 'This record no longer exists.',
+        _ => 'Could not complete the action. Please try again.',
+      };
+      _snack(message);
     } catch (_) {
       if (mounted) _snack('Action failed. Please try again.');
     }
