@@ -22,13 +22,46 @@ class _AuthGateState extends State<AuthGate> {
     return StreamBuilder<User?>(
       stream: _authStream,
       builder: (context, snapshot) {
+        // Firebase is restoring the persisted session.
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Restoring your session...',
+                  ),
+                ],
+              ),
+            ),
+          );
         }
-        // Protected shell is only built when a user exists
-        if (snapshot.hasData) {
-          return const MainShell();
+
+        // Authentication initialization error.
+        if (snapshot.hasError) {
+          return const Scaffold(
+            body: Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Unable to restore your session. '
+                  'Please restart the application.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
         }
+
+        // Persisted authenticated session exists.
+        if (snapshot.data != null) {
+          return const HomeScreen();
+        }
+
+        // No authenticated session.
         return const LoginScreen();
       },
     );

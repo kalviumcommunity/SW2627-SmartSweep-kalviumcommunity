@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'add_issue_record_screen.dart';
@@ -30,6 +31,67 @@ class _HomeScreenState extends State<HomeScreen> {
     const ReportsPage(),
   ];
 
+  // --------------------------------------------------
+  // LOGOUT
+  // --------------------------------------------------
+
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+
+      // No Navigator.push is required here.
+      // AuthGate automatically detects that the
+      // Firebase user became null and displays LoginScreen.
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.message ??
+                'Unable to log out. Please try again.',
+          ),
+        ),
+      );
+    }
+  }
+
+  // --------------------------------------------------
+  // LOGOUT CONFIRMATION
+  // --------------------------------------------------
+
+  Future<void> _showLogoutDialog() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Log Out'),
+          content: const Text(
+            'Are you sure you want to log out of SmartSweep?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Log Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      await _logout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          // Add Firestore Record
+          // ------------------------------------------------
+          // ADD FIRESTORE RECORD
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Add Firestore Record',
             icon: const Icon(
@@ -58,7 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // NEW: Filtered Firestore Query
+          // ------------------------------------------------
+          // FILTER FIRESTORE RECORDS
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Filter Reported Issues',
             icon: const Icon(
@@ -75,7 +143,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // Firestore Test
+          // ------------------------------------------------
+          // FIRESTORE TEST
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Firestore Test',
             icon: const Icon(
@@ -92,18 +163,25 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // Profile
+          // ------------------------------------------------
+          // LOGOUT
+          // ------------------------------------------------
+
           IconButton(
-            tooltip: 'Profile',
-            onPressed: () {},
+            tooltip: 'Logout',
             icon: const Icon(
-              Icons.person_outline,
+              Icons.logout,
             ),
+            onPressed: _showLogoutDialog,
           ),
         ],
       ),
 
       body: pages[selectedIndex],
+
+      // --------------------------------------------------
+      // BOTTOM NAVIGATION
+      // --------------------------------------------------
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
@@ -155,9 +233,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // DASHBOARD
-// --------------------------------------------------
+// ==================================================
 
 class DashboardPage extends StatelessWidget {
   final VoidCallback onViewRoutes;
@@ -169,12 +247,18 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment:
             CrossAxisAlignment.start,
         children: [
+          // ------------------------------------------------
+          // WELCOME
+          // ------------------------------------------------
+
           const Text(
             "Today's Overview",
             style: TextStyle(
@@ -186,7 +270,9 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(height: 6),
 
           Text(
-            'Monitor waste collection activity at a glance.',
+            user?.email != null
+                ? 'Signed in as ${user!.email}'
+                : 'Monitor waste collection activity at a glance.',
             style: TextStyle(
               color: Colors.grey.shade600,
             ),
@@ -194,7 +280,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
+          // ------------------------------------------------
           // KPI CARDS
+          // ------------------------------------------------
+
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -233,6 +322,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 28),
 
+          // ------------------------------------------------
+          // ROUTE STATUS
+          // ------------------------------------------------
+
           const Text(
             'Route Status',
             style: TextStyle(
@@ -266,7 +359,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // View All Routes
+          // ------------------------------------------------
+          // VIEW ROUTES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -282,7 +378,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Report Issue
+          // ------------------------------------------------
+          // REPORT ISSUE
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -306,7 +405,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Add Firestore Record
+          // ------------------------------------------------
+          // ADD ISSUE TO FIRESTORE
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -330,7 +432,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // View all reported issues
+          // ------------------------------------------------
+          // VIEW FIRESTORE ISSUES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -354,7 +459,10 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // NEW: Firestore Query Filter
+          // ------------------------------------------------
+          // FILTER FIRESTORE ISSUES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -383,9 +491,9 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // KPI CARD
-// --------------------------------------------------
+// ==================================================
 
 class KpiCard extends StatelessWidget {
   final String title;
@@ -443,9 +551,9 @@ class KpiCard extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // ROUTE STATUS CARD
-// --------------------------------------------------
+// ==================================================
 
 class RouteStatusCard extends StatelessWidget {
   final String route;
@@ -527,9 +635,9 @@ class RouteStatusCard extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// ROUTES
-// --------------------------------------------------
+// ==================================================
+// ROUTES PAGE
+// ==================================================
 
 class RoutesPage extends StatelessWidget {
   const RoutesPage({super.key});
@@ -540,9 +648,9 @@ class RoutesPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// ALERTS
-// --------------------------------------------------
+// ==================================================
+// ALERTS PAGE
+// ==================================================
 
 class AlertsPage extends StatelessWidget {
   const AlertsPage({super.key});
@@ -596,9 +704,9 @@ class AlertsPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// REPORTS
-// --------------------------------------------------
+// ==================================================
+// REPORTS PAGE
+// ==================================================
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key});

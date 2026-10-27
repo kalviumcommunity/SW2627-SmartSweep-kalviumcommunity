@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../services/firestore_service.dart';
+import '../widgets/reported_issue_image.dart';
 
 class FetchReportedIssuesScreen extends StatefulWidget {
   const FetchReportedIssuesScreen({super.key});
@@ -98,49 +99,62 @@ class _FetchReportedIssuesScreenState extends State<FetchReportedIssuesScreen> {
 
     return Card(
       margin: EdgeInsets.zero,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Icon(
-          isUrgent ? Icons.warning_amber_rounded : Icons.report_outlined,
-          color: isUrgent ? Colors.red : Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(
-          _fieldText(issue['driverName'], 'Unknown driver'),
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Phone: ${_fieldText(issue['phoneNumber'], 'Not provided')}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: Icon(
+              isUrgent ? Icons.warning_amber_rounded : Icons.report_outlined,
+              color: isUrgent
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.primary,
+            ),
+            title: Text(
+              _fieldText(issue['driverName'], 'Unknown driver'),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Phone: ${_fieldText(issue['phoneNumber'], 'Not provided')}',
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Issue: ${_fieldText(issue['issueDescription'], 'No description provided')}',
+                  ),
+                  const SizedBox(height: 4),
+                  Text('Urgency: ${isUrgent ? 'Urgent' : 'Not urgent'}'),
+                  const SizedBox(height: 4),
+                  Text('Created: $createdAtText'),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Issue: ${_fieldText(issue['issueDescription'], 'No description provided')}',
-              ),
-              const SizedBox(height: 4),
-              Text('Urgency: ${isUrgent ? 'Urgent' : 'Not urgent'}'),
-              const SizedBox(height: 4),
-              Text('Created: $createdAtText'),
-            ],
+            ),
+            isThreeLine: true,
+            trailing: IconButton(
+              tooltip: 'Delete reported issue',
+              onPressed: issueId.isEmpty || isDeleting
+                  ? null
+                  : () => _deleteIssue(issueId),
+              icon: isDeleting
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.delete_outline),
+            ),
           ),
-        ),
-        isThreeLine: true,
-        trailing: IconButton(
-          tooltip: 'Delete reported issue',
-          onPressed: issueId.isEmpty || isDeleting
-              ? null
-              : () => _deleteIssue(issueId),
-          icon: isDeleting
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.delete_outline),
-        ),
+          if (issue['imageUrl'] is String &&
+              (issue['imageUrl'] as String).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: ReportedIssueImage(imageUrl: issue['imageUrl'] as String),
+            ),
+        ],
       ),
     );
   }
