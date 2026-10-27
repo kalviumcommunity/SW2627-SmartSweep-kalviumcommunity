@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'live_zones_screen.dart';
-import 'storage_status_screen.dart';
-import 'zones_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, this.onOpenTab});
+
+  /// Asks the shell to switch to another tab (1 = Zones, 2 = Live, 3 = Storage)
+  final ValueChanged<int>? onOpenTab;
 
   Future<void> _logout(BuildContext context) async {
     final navigator = Navigator.of(context);
@@ -30,7 +30,7 @@ class DashboardScreen extends StatelessWidget {
     );
     if (confirmed != true) return;
 
-    // Close any screens pushed on top of the dashboard so none stay reachable
+    // Close any screens pushed on top so none stay reachable
     navigator.popUntil((route) => route.isFirst);
 
     try {
@@ -72,30 +72,21 @@ class DashboardScreen extends StatelessWidget {
               Text(user?.email ?? 'Unknown user'),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LiveZonesScreen()),
-                ),
-                icon: const Icon(Icons.sensors),
-                label: const Text('Live zone monitor'),
-              ),
-              const SizedBox(height: 12),
-              FilledButton.tonalIcon(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ZonesScreen()),
-                ),
+                onPressed: () => onOpenTab?.call(1),
                 icon: const Icon(Icons.location_city),
-                label: const Text('Manage zones'),
+                label: const Text('Go to Zones'),
               ),
               const SizedBox(height: 12),
               FilledButton.tonalIcon(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const StorageStatusScreen()),
-                ),
+                onPressed: () => onOpenTab?.call(2),
+                icon: const Icon(Icons.sensors),
+                label: const Text('Go to Live monitor'),
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => onOpenTab?.call(3),
                 icon: const Icon(Icons.cloud_upload),
-                label: const Text('Storage connection'),
+                label: const Text('Go to Storage'),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
