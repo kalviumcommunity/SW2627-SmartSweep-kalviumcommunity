@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'add_issue_record_screen.dart';
 import 'fetch_reported_issues_screen.dart';
 import 'filtered_issues_screen.dart';
 import 'firestore_test_screen.dart';
+import 'report_issue_screen.dart';
 import 'route_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,67 +31,157 @@ class _HomeScreenState extends State<HomeScreen> {
     const ReportsPage(),
   ];
 
+  // --------------------------------------------------
+  // LOGOUT
+  // --------------------------------------------------
+
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+
+      // No Navigator.push is required here.
+      // AuthGate automatically detects that the
+      // Firebase user became null and displays LoginScreen.
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.message ??
+                'Unable to log out. Please try again.',
+          ),
+        ),
+      );
+    }
+  }
+
+  // --------------------------------------------------
+  // LOGOUT CONFIRMATION
+  // --------------------------------------------------
+
+  Future<void> _showLogoutDialog() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Log Out'),
+          content: const Text(
+            'Are you sure you want to log out of SmartSweep?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Log Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      await _logout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'SmartSweep',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
-          // Add Firestore Record
+          // ------------------------------------------------
+          // ADD FIRESTORE RECORD
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Add Firestore Record',
-            icon: const Icon(Icons.add_circle_outline),
+            icon: const Icon(
+              Icons.add_circle_outline,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddIssueRecordScreen(),
+                  builder: (context) =>
+                      const AddIssueRecordScreen(),
                 ),
               );
             },
           ),
 
-          // NEW: Filtered Firestore Query
+          // ------------------------------------------------
+          // FILTER FIRESTORE RECORDS
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Filter Reported Issues',
-            icon: const Icon(Icons.filter_alt_outlined),
+            icon: const Icon(
+              Icons.filter_alt_outlined,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const FilteredIssuesScreen(),
+                  builder: (context) =>
+                      const FilteredIssuesScreen(),
                 ),
               );
             },
           ),
 
-          // Firestore Test
+          // ------------------------------------------------
+          // FIRESTORE TEST
+          // ------------------------------------------------
+
           IconButton(
             tooltip: 'Firestore Test',
-            icon: const Icon(Icons.cloud_outlined),
+            icon: const Icon(
+              Icons.cloud_outlined,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const FirestoreTestScreen(),
+                  builder: (context) =>
+                      const FirestoreTestScreen(),
                 ),
               );
             },
           ),
 
-          // Profile
+          // ------------------------------------------------
+          // LOGOUT
+          // ------------------------------------------------
+
           IconButton(
-            tooltip: 'Profile',
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline),
+            tooltip: 'Logout',
+            icon: const Icon(
+              Icons.logout,
+            ),
+            onPressed: _showLogoutDialog,
           ),
         ],
       ),
 
       body: pages[selectedIndex],
+
+      // --------------------------------------------------
+      // BOTTOM NAVIGATION
+      // --------------------------------------------------
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
@@ -100,23 +192,39 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
+            icon: Icon(
+              Icons.dashboard_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.dashboard,
+            ),
             label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(Icons.route_outlined),
-            selectedIcon: Icon(Icons.route),
+            icon: Icon(
+              Icons.route_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.route,
+            ),
             label: 'Routes',
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
+            icon: Icon(
+              Icons.notifications_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.notifications,
+            ),
             label: 'Alerts',
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
+            icon: Icon(
+              Icons.bar_chart_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.bar_chart,
+            ),
             label: 'Reports',
           ),
         ],
@@ -125,41 +233,62 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // DASHBOARD
-// --------------------------------------------------
+// ==================================================
 
 class DashboardPage extends StatelessWidget {
   final VoidCallback onViewRoutes;
 
-  const DashboardPage({super.key, required this.onViewRoutes});
+  const DashboardPage({
+    super.key,
+    required this.onViewRoutes,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
+          // ------------------------------------------------
+          // WELCOME
+          // ------------------------------------------------
+
           const Text(
             "Today's Overview",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
 
           const SizedBox(height: 6),
 
           Text(
-            'Monitor waste collection activity at a glance.',
-            style: TextStyle(color: Colors.grey.shade600),
+            user?.email != null
+                ? 'Signed in as ${user!.email}'
+                : 'Monitor waste collection activity at a glance.',
+            style: TextStyle(
+              color: Colors.grey.shade600,
+            ),
           ),
 
           const SizedBox(height: 20),
 
+          // ------------------------------------------------
           // KPI CARDS
+          // ------------------------------------------------
+
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics:
+                const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1.5,
@@ -193,9 +322,16 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 28),
 
+          // ------------------------------------------------
+          // ROUTE STATUS
+          // ------------------------------------------------
+
           const Text(
             'Route Status',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -223,19 +359,29 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // View All Routes
+          // ------------------------------------------------
+          // VIEW ROUTES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onViewRoutes,
-              icon: const Icon(Icons.route),
-              label: const Text('View All Routes'),
+              icon: const Icon(
+                Icons.route,
+              ),
+              label: const Text(
+                'View All Routes',
+              ),
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // Report Issue
+          // ------------------------------------------------
+          // REPORT ISSUE
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -243,18 +389,26 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const AddIssueRecordScreen(),
+                    builder: (_) =>
+                        const ReportIssueScreen(),
                   ),
                 );
               },
-              icon: const Icon(Icons.report_problem_outlined),
-              label: const Text('Report an Issue'),
+              icon: const Icon(
+                Icons.report_problem_outlined,
+              ),
+              label: const Text(
+                'Report an Issue',
+              ),
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // Add Firestore Record
+          // ------------------------------------------------
+          // ADD ISSUE TO FIRESTORE
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -262,18 +416,26 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const AddIssueRecordScreen(),
+                    builder: (_) =>
+                        const AddIssueRecordScreen(),
                   ),
                 );
               },
-              icon: const Icon(Icons.cloud_upload_outlined),
-              label: const Text('Add Issue to Firestore'),
+              icon: const Icon(
+                Icons.cloud_upload_outlined,
+              ),
+              label: const Text(
+                'Add Issue to Firestore',
+              ),
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // View all reported issues
+          // ------------------------------------------------
+          // VIEW FIRESTORE ISSUES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -281,18 +443,26 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const FetchReportedIssuesScreen(),
+                    builder: (_) =>
+                        const FetchReportedIssuesScreen(),
                   ),
                 );
               },
-              icon: const Icon(Icons.list_alt_outlined),
-              label: const Text('View Reported Issues'),
+              icon: const Icon(
+                Icons.list_alt_outlined,
+              ),
+              label: const Text(
+                'View Reported Issues',
+              ),
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // NEW: Firestore Query Filter
+          // ------------------------------------------------
+          // FILTER FIRESTORE ISSUES
+          // ------------------------------------------------
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -300,12 +470,17 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const FilteredIssuesScreen(),
+                    builder: (_) =>
+                        const FilteredIssuesScreen(),
                   ),
                 );
               },
-              icon: const Icon(Icons.filter_alt_outlined),
-              label: const Text('Filter Reported Issues'),
+              icon: const Icon(
+                Icons.filter_alt_outlined,
+              ),
+              label: const Text(
+                'Filter Reported Issues',
+              ),
             ),
           ),
 
@@ -316,9 +491,9 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // KPI CARD
-// --------------------------------------------------
+// ==================================================
 
 class KpiCard extends StatelessWidget {
   final String title;
@@ -341,15 +516,23 @@ class KpiCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(
+              icon,
+              color: color,
+              size: 28,
+            ),
 
             const SizedBox(height: 8),
 
             Text(
               value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
 
             const SizedBox(height: 4),
@@ -357,7 +540,9 @@ class KpiCard extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade700),
+              style: TextStyle(
+                color: Colors.grey.shade700,
+              ),
             ),
           ],
         ),
@@ -366,9 +551,9 @@ class KpiCard extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
+// ==================================================
 // ROUTE STATUS CARD
-// --------------------------------------------------
+// ==================================================
 
 class RouteStatusCard extends StatelessWidget {
   final String route;
@@ -403,23 +588,46 @@ class RouteStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(
+        bottom: 10,
+      ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: statusColor.withAlpha(30),
-          child: Icon(Icons.local_shipping_outlined, color: statusColor),
+          backgroundColor:
+              statusColor.withAlpha(30),
+          child: Icon(
+            Icons.local_shipping_outlined,
+            color: statusColor,
+          ),
         ),
-        title: Text(route, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('$area • Driver: $driver'),
+        title: Text(
+          route,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          '$area • Driver: $driver',
+        ),
         trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding:
+              const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
           decoration: BoxDecoration(
-            color: statusColor.withAlpha(30),
-            borderRadius: BorderRadius.circular(20),
+            color:
+                statusColor.withAlpha(30),
+            borderRadius:
+                BorderRadius.circular(20),
           ),
           child: Text(
             status,
-            style: TextStyle(color: statusColor, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: statusColor,
+              fontWeight:
+                  FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -427,9 +635,9 @@ class RouteStatusCard extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// ROUTES
-// --------------------------------------------------
+// ==================================================
+// ROUTES PAGE
+// ==================================================
 
 class RoutesPage extends StatelessWidget {
   const RoutesPage({super.key});
@@ -440,9 +648,9 @@ class RoutesPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// ALERTS
-// --------------------------------------------------
+// ==================================================
+// ALERTS PAGE
+// ==================================================
 
 class AlertsPage extends StatelessWidget {
   const AlertsPage({super.key});
@@ -454,24 +662,41 @@ class AlertsPage extends StatelessWidget {
       children: const [
         Text(
           'Alerts',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
 
         SizedBox(height: 16),
 
         Card(
           child: ListTile(
-            leading: Icon(Icons.warning_amber, color: Colors.orange),
-            title: Text('Collection pending'),
-            subtitle: Text('Route 02 • Palasia'),
+            leading: Icon(
+              Icons.warning_amber,
+              color: Colors.orange,
+            ),
+            title: Text(
+              'Collection pending',
+            ),
+            subtitle: Text(
+              'Route 02 • Palasia',
+            ),
           ),
         ),
 
         Card(
           child: ListTile(
-            leading: Icon(Icons.notifications_active, color: Colors.red),
-            title: Text('Collection alert'),
-            subtitle: Text('Review the reported collection issue.'),
+            leading: Icon(
+              Icons.notifications_active,
+              color: Colors.red,
+            ),
+            title: Text(
+              'Collection alert',
+            ),
+            subtitle: Text(
+              'Review the reported collection issue.',
+            ),
           ),
         ),
       ],
@@ -479,9 +704,9 @@ class AlertsPage extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------
-// REPORTS
-// --------------------------------------------------
+// ==================================================
+// REPORTS PAGE
+// ==================================================
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key});
@@ -493,16 +718,26 @@ class ReportsPage extends StatelessWidget {
       children: const [
         Text(
           'Reports',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
 
         SizedBox(height: 16),
 
         Card(
           child: ListTile(
-            leading: Icon(Icons.assessment_outlined, color: Colors.green),
-            title: Text('Collection Summary'),
-            subtitle: Text('View waste collection activity.'),
+            leading: Icon(
+              Icons.assessment_outlined,
+              color: Colors.green,
+            ),
+            title: Text(
+              'Collection Summary',
+            ),
+            subtitle: Text(
+              'View waste collection activity.',
+            ),
           ),
         ),
       ],
