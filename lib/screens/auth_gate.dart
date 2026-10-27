@@ -12,18 +12,46 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // Firebase is restoring the persisted session.
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Restoring your session...',
+                  ),
+                ],
+              ),
             ),
           );
         }
 
-        if (snapshot.hasData) {
+        // Authentication initialization error.
+        if (snapshot.hasError) {
+          return const Scaffold(
+            body: Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Unable to restore your session. '
+                  'Please restart the application.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Persisted authenticated session exists.
+        if (snapshot.data != null) {
           return const HomeScreen();
         }
 
+        // No authenticated session.
         return const LoginScreen();
       },
     );
