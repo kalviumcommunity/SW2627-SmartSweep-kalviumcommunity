@@ -57,3 +57,5 @@ __pycache__/
 /test-results/
 /core
 core.*
+node_modules/
+*.bundle
