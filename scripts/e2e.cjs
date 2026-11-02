@@ -62,6 +62,12 @@ const assert = require('node:assert/strict');
     await routeForm.locator('select[name="zone_id"]').selectOption({label:'Browser test zone'});
     await routeForm.locator('select[name="vehicle_id"]').selectOption({label:'Browser test vehicle'});
     await routeForm.locator('select[name="driver_id"]').selectOption({label:'Browser test team'});
+    const localInput = seconds => {
+      const d = new Date(seconds * 1000);
+      return new Date(
+        d.getTime() - d.getTimezoneOffset() * 60000
+      ).toISOString().slice(0, 16);
+    };
     let current=await state(supervisor);
     await routeForm.getByLabel('Start',{exact:true}).fill(localInput(current.now));
     await routeForm.getByLabel('Deadline',{exact:true}).fill(localInput(current.now+3600));
