@@ -1,0 +1,12 @@
+{
+  "name": "smartsweep-browser-tests",
+  "private": true,
+  "scripts": {
+    "test:e2e": "node scripts/e2e.cjs",
+    "test:console": "node scripts/console-test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0",
+    "playwright": "1.62.1"
+  }
+}
