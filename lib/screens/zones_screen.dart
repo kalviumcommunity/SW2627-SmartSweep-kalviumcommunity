@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/zone.dart';
 import '../services/zone_service.dart';
 import 'edit_zone_screen.dart';
@@ -42,6 +43,29 @@ class _ZonesScreenState extends State<ZonesScreen> {
   }
 
   Future<void> _onAction(String action, Zone zone) async {
+    if (action == 'delete') {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Delete issue?'),
+          content: const Text(
+            'Are you sure you want to delete this issue? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmed != true) return;
+    }
+
     try {
       switch (action) {
         case 'edit':
@@ -49,14 +73,26 @@ class _ZonesScreenState extends State<ZonesScreen> {
           break;
         case 'missed':
           await _service.recordMissed(zone.id); // update(): only missedCount
+          if (mounted) _snack('Missed collection recorded.');
           break;
         case 'serviced':
           await _service.markServiced(zone.id); // update(): only lastServicedAt
+          if (mounted) _snack('Zone marked as serviced.');
           break;
         case 'delete':
           await _service.deleteZone(zone.id);
+          if (mounted) _snack('Record deleted.');
           break;
       }
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
+      final message = switch (error.code) {
+        'permission-denied' => 'You do not have permission to update this record.',
+        'unavailable' => 'No connection. Check your network and try again.',
+        'not-found' => 'This record no longer exists.',
+        _ => 'Could not complete the action. Please try again.',
+      };
+      _snack(message);
     } catch (_) {
       if (mounted) _snack('Action failed. Please try again.');
     }

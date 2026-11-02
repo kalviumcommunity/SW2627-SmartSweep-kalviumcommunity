@@ -96,15 +96,24 @@ class _AddIssueRecordScreenState extends State<AddIssueRecordScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Issue saved successfully to Firestore.')),
+        const SnackBar(content: Text('Issue added.')),
+      );
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
+
+      final message = switch (error.code) {
+        'permission-denied' => 'You do not have permission to save this issue.',
+        'unavailable' => 'No connection. Check your network and try again.',
+        _ => 'Could not save the issue. Please try again.',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
       );
     } catch (_) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to save the issue. Please try again.'),
-        ),
+        const SnackBar(content: Text('Could not save the issue. Please try again.')),
       );
     } finally {
       if (mounted) {
