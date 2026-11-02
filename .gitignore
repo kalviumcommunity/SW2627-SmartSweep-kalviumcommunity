@@ -46,3 +46,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local operational database, credentials and test artifacts
+/data/
+*.db
+*.db-shm
+*.db-wal
+.env
+__pycache__/
+/test-results/
+/core
+core.*
