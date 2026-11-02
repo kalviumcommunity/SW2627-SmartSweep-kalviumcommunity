@@ -1,1 +1,0 @@
-"""SmartSweep local operational API."""
