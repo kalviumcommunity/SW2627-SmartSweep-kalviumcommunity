@@ -72,9 +72,15 @@ class _EditZoneScreenState extends State<EditZoneScreen> {
           _ => 'Could not save changes. Please try again.',
         };
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage!)),
+      );
     } catch (_) {
       if (!mounted) return;
       setState(() => errorMessage = 'Something went wrong. Please try again.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong. Please try again.')),
+      );
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
