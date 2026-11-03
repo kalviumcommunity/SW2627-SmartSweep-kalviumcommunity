@@ -114,8 +114,10 @@ class _OperationsScreenState extends State<OperationsScreen> {
         ))),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           FilledButton(onPressed: () {
-            if (form.currentState!.validate()) Navigator.pop(context,
-              <String,dynamic>{for (final e in controllers.entries) e.key: e.value.text.trim(), ...selections});
+            if (form.currentState!.validate()) {
+              Navigator.pop(context,
+                <String,dynamic>{for (final e in controllers.entries) e.key: e.value.text.trim(), ...selections});
+            }
           }, child: const Text('Save record'))],
       ),
     );
@@ -170,30 +172,36 @@ class _OperationsScreenState extends State<OperationsScreen> {
   }
 
   List<Widget> content() {
-    if (tab == 0) return [
-      const Text('Collection records are operator reports; verified completion requires a different supervisor’s review.'),
-      for (final r in rows('routes')) route(r),
-    ];
-    if (tab == 1) return [
-      const Text('Alert resolution does not erase failures or verify collection.'),
-      for (final i in rows('incidents')) Card(child: ListTile(
-        title: Text('${i['kind']} · Route #${i['route_id']} · ${i['resolved'] == null ? 'Unresolved' : 'Resolved'}'),
-        subtitle: Text('${i['detail']}\n${date(i['occurred'])}\n${i['resolution'] ?? ''}'),
-        trailing: supervisor && i['resolved'] == null ? command('Respond','resolve',i['id']) : null,
-      )),
-    ];
-    if (tab == 2) return [
-      Text('Recurring = ${data!['recurrence']} or more missed occurrences per zone in $days days. Misses remain after recovery.'),
-      DropdownButton<int>(value: days, items: [7,30,90,365].map((v) => DropdownMenuItem(value:v,child:Text('$v days'))).toList(),
-        onChanged: (v) { setState(() => days=v!); refresh(); }),
-      for (final a in rows('analytics')) Card(child: ListTile(
-        title: Text('${a['zone']} · ${a['recurring'] == true ? 'Recurring failures' : 'Below recurrence threshold'}'),
-        subtitle: Text('${a['misses']} missed / ${a['scheduled']} due\nAffected routes: ${a['route_ids']}\nRecent 7 days: ${a['recent_7_days']}; preceding 7: ${a['previous_7_days']}'),
-      )),
-      const Text('Event history'),
-      for (final e in rows('events')) ListTile(title: Text('${e['kind']} · Route #${e['route_id']}'),
-        subtitle: Text('${date(e['occurred'])} · ${e['actor_email'] ?? 'Automatic detector'}\n${e['detail']}')),
-    ];
+    if (tab == 0) {
+      return [
+        const Text('Collection records are operator reports; verified completion requires a different supervisor’s review.'),
+        for (final r in rows('routes')) route(r),
+      ];
+    }
+    if (tab == 1) {
+      return [
+        const Text('Alert resolution does not erase failures or verify collection.'),
+        for (final i in rows('incidents')) Card(child: ListTile(
+          title: Text('${i['kind']} · Route #${i['route_id']} · ${i['resolved'] == null ? 'Unresolved' : 'Resolved'}'),
+          subtitle: Text('${i['detail']}\n${date(i['occurred'])}\n${i['resolution'] ?? ''}'),
+          trailing: supervisor && i['resolved'] == null ? command('Respond','resolve',i['id']) : null,
+        )),
+      ];
+    }
+    if (tab == 2) {
+      return [
+        Text('Recurring = ${data!['recurrence']} or more missed occurrences per zone in $days days. Misses remain after recovery.'),
+        DropdownButton<int>(value: days, items: [7,30,90,365].map((v) => DropdownMenuItem(value:v,child:Text('$v days'))).toList(),
+          onChanged: (v) { setState(() => days=v!); refresh(); }),
+        for (final a in rows('analytics')) Card(child: ListTile(
+          title: Text('${a['zone']} · ${a['recurring'] == true ? 'Recurring failures' : 'Below recurrence threshold'}'),
+          subtitle: Text('${a['misses']} missed / ${a['scheduled']} due\nAffected routes: ${a['route_ids']}\nRecent 7 days: ${a['recent_7_days']}; preceding 7: ${a['previous_7_days']}'),
+        )),
+        const Text('Event history'),
+        for (final e in rows('events')) ListTile(title: Text('${e['kind']} · Route #${e['route_id']}'),
+          subtitle: Text('${date(e['occurred'])} · ${e['actor_email'] ?? 'Automatic detector'}\n${e['detail']}')),
+      ];
+    }
     return [
       for (final z in rows('zones')) ListTile(title: Text(z['name']),subtitle: Text('${z['schedule']} · ${z['active']==1?'Active':'Inactive'}'),
         trailing: supervisor ? TextButton(onPressed: busy ? null : () => run(() async { await api.request('zone-active',{'id':z['id'],'active':z['active']==1?0:1}); }),child:const Text('Toggle active')) : null),
