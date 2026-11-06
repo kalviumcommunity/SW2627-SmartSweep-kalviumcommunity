@@ -140,6 +140,12 @@ GitHub Actions configuration runs backend, DOM, browser and Flutter validation o
 - Recurrence is calculated from durable missed-incident records, not editable counters. Misses include unverified completion at deadline, so operational policy must account for review staffing.
 - Historical lists are unpaginated. This is appropriate for the local demonstration dataset, not a large fleet archive.
 - Full Flutter build/device testing and real-browser validation remain required before claiming the Flutter client works end to end or deploying this publicly.
-- ## Final Sprint Review
+## Final Sprint Review
 
 SmartSweep documentation has been reviewed and updated for the final sprint submission. The project includes Firebase Authentication, Firestore, security rules, storage, persistent login, and search/filtering features.
+cat >> README.md <<'EOF'
+
+## Final Sprint Review
+
+SmartSweep documentation has been reviewed and updated for the final sprint submission. The project includes Firebase Authentication, Firestore, security rules, storage, persistent login, and search/filtering features.
+EOF

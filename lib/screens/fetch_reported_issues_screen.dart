@@ -14,8 +14,7 @@ class FetchReportedIssuesScreen extends StatefulWidget {
 
 class _FetchReportedIssuesScreenState
     extends State<FetchReportedIssuesScreen> {
-  final FirestoreService _firestoreService =
-      FirestoreService();
+  final FirestoreService _firestoreService = FirestoreService();
 
   late Future<List<Map<String, dynamic>>> _issuesFuture;
 
@@ -30,9 +29,7 @@ class _FetchReportedIssuesScreenState
   @override
   void initState() {
     super.initState();
-
-    _issuesFuture =
-        _firestoreService.fetchReportedIssues();
+    _issuesFuture = _firestoreService.fetchReportedIssues();
   }
 
   @override
@@ -47,8 +44,7 @@ class _FetchReportedIssuesScreenState
 
   void _retry() {
     setState(() {
-      _issuesFuture =
-          _firestoreService.fetchReportedIssues();
+      _issuesFuture = _firestoreService.fetchReportedIssues();
     });
   }
 
@@ -56,35 +52,22 @@ class _FetchReportedIssuesScreenState
   // LIVE SEARCH
   // --------------------------------------------------
 
-  bool _matchesSearch(
-    Map<String, dynamic> issue,
-  ) {
+  bool _matchesSearch(Map<String, dynamic> issue) {
     if (_searchText.isEmpty) {
       return true;
     }
 
     final driverName =
-        issue['driverName']
-            ?.toString()
-            .toLowerCase() ??
-        '';
+        issue['driverName']?.toString().toLowerCase() ?? '';
 
     final phoneNumber =
-        issue['phoneNumber']
-            ?.toString()
-            .toLowerCase() ??
-        '';
+        issue['phoneNumber']?.toString().toLowerCase() ?? '';
 
     final issueDescription =
-        issue['issueDescription']
-            ?.toString()
-            .toLowerCase() ??
-        '';
+        issue['issueDescription']?.toString().toLowerCase() ?? '';
 
     final urgency =
-        issue['isUrgent'] == true
-            ? 'urgent'
-            : 'normal';
+        issue['isUrgent'] == true ? 'urgent' : 'normal';
 
     return driverName.contains(_searchText) ||
         phoneNumber.contains(_searchText) ||
@@ -96,15 +79,12 @@ class _FetchReportedIssuesScreenState
   // URGENCY FILTER
   // --------------------------------------------------
 
-  bool _matchesUrgency(
-    Map<String, dynamic> issue,
-  ) {
+  bool _matchesUrgency(Map<String, dynamic> issue) {
     if (_urgencyFilter == 'all') {
       return true;
     }
 
-    final isUrgent =
-        issue['isUrgent'] == true;
+    final isUrgent = issue['isUrgent'] == true;
 
     if (_urgencyFilter == 'urgent') {
       return isUrgent;
@@ -121,11 +101,8 @@ class _FetchReportedIssuesScreenState
   // DELETE ISSUE
   // --------------------------------------------------
 
-  Future<void> _deleteIssue(
-    String id,
-  ) async {
-    final confirmed =
-        await showDialog<bool>(
+  Future<void> _deleteIssue(String id) async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete issue?'),
@@ -134,62 +111,44 @@ class _FetchReportedIssuesScreenState
         ),
         actions: [
           TextButton(
-            onPressed: () =>
-                Navigator.pop(
-              dialogContext,
-              false,
-            ),
-            child: const Text(
-              'Cancel',
-            ),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () =>
-                Navigator.pop(
-              dialogContext,
-              true,
-            ),
-            child: const Text(
-              'Delete',
-            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
 
-    if (!mounted ||
-        confirmed != true ||
-        _deletingIssueIds.contains(id)) {
+    if (!mounted || confirmed != true || _deletingIssueIds.contains(id)) {
       return;
     }
 
-    setState(
-      () => _deletingIssueIds.add(id),
-    );
+    setState(() => _deletingIssueIds.add(id));
 
     try {
-      await _firestoreService
-          .deleteReportedIssue(id);
+      await _firestoreService.deleteReportedIssue(id);
 
       if (!mounted) return;
 
       setState(() {
         _deletingIssueIds.remove(id);
-
-        _issuesFuture =
-            _firestoreService
-                .fetchReportedIssues();
+        _issuesFuture = _firestoreService.fetchReportedIssues();
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Reported issue deleted.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reported issue deleted.')),
+      );
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
       setState(() => _deletingIssueIds.remove(id));
       final message = switch (error.code) {
-        'permission-denied' => 'You do not have permission to delete this issue.',
-        'unavailable' => 'No connection. Check your network and try again.',
+        'permission-denied' =>
+          'You do not have permission to delete this issue.',
+        'unavailable' =>
+          'No connection. Check your network and try again.',
         _ => 'Could not delete the issue. Please try again.',
       };
       ScaffoldMessenger.of(context).showSnackBar(
@@ -200,7 +159,8 @@ class _FetchReportedIssuesScreenState
 
       setState(() => _deletingIssueIds.remove(id));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not delete the issue. Please try again.')),
+        const SnackBar(
+            content: Text('Could not delete the issue. Please try again.')),
       );
     }
   }
@@ -209,9 +169,7 @@ class _FetchReportedIssuesScreenState
   // CREATED AT
   // --------------------------------------------------
 
-  DateTime? _createdAt(
-    Map<String, dynamic> issue,
-  ) {
+  DateTime? _createdAt(Map<String, dynamic> issue) {
     final value = issue['createdAt'];
 
     if (value is Timestamp) {
@@ -233,20 +191,14 @@ class _FetchReportedIssuesScreenState
   // FIELD TEXT HELPER
   // --------------------------------------------------
 
-  String _fieldText(
-    dynamic value,
-    String fallback,
-  ) {
+  String _fieldText(dynamic value, String fallback) {
     if (value == null) {
       return fallback;
     }
 
-    final text =
-        value.toString().trim();
+    final text = value.toString().trim();
 
-    return text.isEmpty
-        ? fallback
-        : text;
+    return text.isEmpty ? fallback : text;
   }
 
   // --------------------------------------------------
@@ -257,34 +209,26 @@ class _FetchReportedIssuesScreenState
     BuildContext context,
     Map<String, dynamic> issue,
   ) {
-    final issueId =
-        issue['id']?.toString() ?? '';
+    final issueId = issue['id']?.toString() ?? '';
 
-    final isDeleting =
-        _deletingIssueIds
-            .contains(issueId);
+    final isDeleting = _deletingIssueIds.contains(issueId);
 
-    final isUrgent =
-        issue['isUrgent'] == true;
+    final isUrgent = issue['isUrgent'] == true;
 
-    final createdAt =
-        _createdAt(issue)?.toLocal();
+    final createdAt = _createdAt(issue)?.toLocal();
 
-    final createdAtText =
-        createdAt == null
-            ? 'Not available'
-            : '${MaterialLocalizations.of(context).formatMediumDate(createdAt)} '
-                '${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(createdAt))}';
+    final createdAtText = createdAt == null
+        ? 'Not available'
+        : '${MaterialLocalizations.of(context).formatMediumDate(createdAt)} '
+            '${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(createdAt))}';
 
     return Card(
       margin: EdgeInsets.zero,
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ListTile(
-            contentPadding:
-                const EdgeInsets.all(16),
+            contentPadding: const EdgeInsets.all(16),
 
             leading: Icon(
               isUrgent
@@ -292,58 +236,32 @@ class _FetchReportedIssuesScreenState
                   : Icons.report_outlined,
               color: isUrgent
                   ? Colors.red
-                  : Theme.of(context)
-                      .colorScheme
-                      .primary,
+                  : Theme.of(context).colorScheme.primary,
             ),
 
             title: Text(
-              _fieldText(
-                issue['driverName'],
-                'Unknown driver',
-              ),
-              style: const TextStyle(
-                fontWeight:
-                    FontWeight.w600,
-              ),
+              _fieldText(issue['driverName'], 'Unknown driver'),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
 
             subtitle: Padding(
-              padding:
-                  const EdgeInsets.only(
-                top: 8,
-              ),
+              padding: const EdgeInsets.only(top: 8),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Phone: ${_fieldText(issue['phoneNumber'], 'Not provided')}',
                   ),
-
-                  const SizedBox(
-                    height: 4,
-                  ),
-
+                  const SizedBox(height: 4),
                   Text(
                     'Issue: ${_fieldText(issue['issueDescription'], 'No description provided')}',
                   ),
-
-                  const SizedBox(
-                    height: 4,
-                  ),
-
+                  const SizedBox(height: 4),
                   Text(
                     'Urgency: ${isUrgent ? 'Urgent' : 'Not urgent'}',
                   ),
-
-                  const SizedBox(
-                    height: 4,
-                  ),
-
-                  Text(
-                    'Created: $createdAtText',
-                  ),
+                  const SizedBox(height: 4),
+                  Text('Created: $createdAtText'),
                 ],
               ),
             ),
@@ -351,49 +269,26 @@ class _FetchReportedIssuesScreenState
             isThreeLine: true,
 
             trailing: IconButton(
-              tooltip:
-                  'Delete reported issue',
-              onPressed:
-                  issueId.isEmpty ||
-                          isDeleting
-                      ? null
-                      : () =>
-                          _deleteIssue(
-                            issueId,
-                          ),
+              tooltip: 'Delete reported issue',
+              onPressed: issueId.isEmpty || isDeleting
+                  ? null
+                  : () => _deleteIssue(issueId),
               icon: isDeleting
                   ? const SizedBox(
                       width: 24,
                       height: 24,
-                      child:
-                          CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(
-                      Icons.delete_outline,
-                    ),
+                  : const Icon(Icons.delete_outline),
             ),
           ),
 
-          if (issue['imageUrl']
-                  is String &&
-              (issue['imageUrl']
-                      as String)
-                  .isNotEmpty)
+          if (issue['imageUrl'] is String &&
+              (issue['imageUrl'] as String).isNotEmpty)
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(
-                16,
-                0,
-                16,
-                16,
-              ),
-              child:
-                  ReportedIssueImage(
-                imageUrl:
-                    issue['imageUrl']
-                        as String,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: ReportedIssueImage(
+                imageUrl: issue['imageUrl'] as String,
               ),
             ),
         ],
@@ -406,60 +301,34 @@ class _FetchReportedIssuesScreenState
   // --------------------------------------------------
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Reported Issues',
-        ),
+        title: const Text('Reported Issues'),
       ),
-
-      body: FutureBuilder<
-          List<Map<String, dynamic>>>(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _issuesFuture,
-
-        builder:
-            (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child:
-                  CircularProgressIndicator(),
-            );
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
             return Center(
               child: Padding(
-                padding:
-                    const EdgeInsets.all(
-                  24,
-                ),
+                padding: const EdgeInsets.all(24),
                 child: Column(
-                  mainAxisSize:
-                      MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
                       'Could not load reported issues. Check your connection and try again.',
-                      textAlign:
-                          TextAlign.center,
+                      textAlign: TextAlign.center,
                     ),
-
-                    const SizedBox(
-                      height: 12,
-                    ),
-
+                    const SizedBox(height: 12),
                     FilledButton.icon(
                       onPressed: _retry,
-                      icon: const Icon(
-                        Icons.refresh,
-                      ),
-                      label:
-                          const Text(
-                        'Retry',
-                      ),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
                     ),
                   ],
                 ),
@@ -468,27 +337,16 @@ class _FetchReportedIssuesScreenState
           }
 
           final issues =
-              snapshot.data ??
-                  const <
-                      Map<String,
-                          dynamic>>[];
+              snapshot.data ?? const <Map<String, dynamic>>[];
 
           if (issues.isEmpty) {
             return const Center(
-              child: Text(
-                'No reported issues yet.',
-              ),
+              child: Text('No reported issues yet.'),
             );
           }
 
-          // --------------------------------------------
-          // SEARCH + FILTER RESULTS
-          // --------------------------------------------
-
-          final filteredIssues =
-              issues.where((issue) {
-            return _matchesSearch(issue) &&
-                _matchesUrgency(issue);
+          final filteredIssues = issues.where((issue) {
+            return _matchesSearch(issue) && _matchesUrgency(issue);
           }).toList();
 
           return Column(
@@ -498,64 +356,30 @@ class _FetchReportedIssuesScreenState
               // ----------------------------------------
 
               Padding(
-                padding:
-                    const EdgeInsets.fromLTRB(
-                  16,
-                  16,
-                  16,
-                  8,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: TextField(
-                  controller:
-                      _searchController,
-
-                  decoration:
-                      InputDecoration(
-                    labelText:
-                        'Search reported issues',
-
-                    hintText:
-                        'Driver, phone, issue or urgency',
-
-                    prefixIcon:
-                        const Icon(
-                      Icons.search,
-                    ),
-
-                    suffixIcon:
-                        _searchText.isEmpty
-                            ? null
-                            : IconButton(
-                                tooltip:
-                                    'Clear search',
-                                icon:
-                                    const Icon(
-                                  Icons.clear,
-                                ),
-                                onPressed:
-                                    () {
-                                  _searchController
-                                      .clear();
-
-                                  setState(
-                                    () {
-                                      _searchText =
-                                          '';
-                                    },
-                                  );
-                                },
-                              ),
-
-                    border:
-                        const OutlineInputBorder(),
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Search reported issues',
+                    hintText: 'Driver, phone, issue or urgency',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchText.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Clear search',
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchText = '';
+                              });
+                            },
+                          ),
+                    border: const OutlineInputBorder(),
                   ),
-
                   onChanged: (value) {
                     setState(() {
-                      _searchText =
-                          value
-                              .trim()
-                              .toLowerCase();
+                      _searchText = value.trim().toLowerCase();
                     });
                   },
                 ),
@@ -566,69 +390,40 @@ class _FetchReportedIssuesScreenState
               // ----------------------------------------
 
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label:
-                            const Text(
-                          'All',
-                        ),
-                        selected:
-                            _urgencyFilter ==
-                                'all',
+                        label: const Text('All'),
+                        selected: _urgencyFilter == 'all',
                         onSelected: (_) {
                           setState(() {
-                            _urgencyFilter =
-                                'all';
+                            _urgencyFilter = 'all';
                           });
                         },
                       ),
                     ),
-
-                    const SizedBox(
-                      width: 8,
-                    ),
-
+                    const SizedBox(width: 8),
                     Expanded(
                       child: ChoiceChip(
-                        label:
-                            const Text(
-                          'Urgent',
-                        ),
-                        selected:
-                            _urgencyFilter ==
-                                'urgent',
+                        label: const Text('Urgent'),
+                        selected: _urgencyFilter == 'urgent',
                         onSelected: (_) {
                           setState(() {
-                            _urgencyFilter =
-                                'urgent';
+                            _urgencyFilter = 'urgent';
                           });
                         },
                       ),
                     ),
-
-                    const SizedBox(
-                      width: 8,
-                    ),
-
+                    const SizedBox(width: 8),
                     Expanded(
                       child: ChoiceChip(
-                        label:
-                            const Text(
-                          'Normal',
-                        ),
-                        selected:
-                            _urgencyFilter ==
-                                'normal',
+                        label: const Text('Normal'),
+                        selected: _urgencyFilter == 'normal',
                         onSelected: (_) {
                           setState(() {
-                            _urgencyFilter =
-                                'normal';
+                            _urgencyFilter = 'normal';
                           });
                         },
                       ),
@@ -637,38 +432,27 @@ class _FetchReportedIssuesScreenState
                 ),
               ),
 
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
 
               // ----------------------------------------
               // RESULT COUNT
               // ----------------------------------------
 
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
-                  alignment:
-                      Alignment.centerLeft,
+                  alignment: Alignment.centerLeft,
                   child: Text(
                     '${filteredIssues.length} result${filteredIssues.length == 1 ? '' : 's'}',
                     style: TextStyle(
-                      color: Colors
-                          .grey
-                          .shade700,
-                      fontWeight:
-                          FontWeight.w600,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
 
               // ----------------------------------------
               // NO MATCHES
@@ -678,47 +462,25 @@ class _FetchReportedIssuesScreenState
                 Expanded(
                   child: Center(
                     child: Padding(
-                      padding:
-                          const EdgeInsets.all(
-                        24,
-                      ),
+                      padding: const EdgeInsets.all(24),
                       child: Column(
-                        mainAxisSize:
-                            MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.search_off,
-                            size: 64,
-                          ),
-
-                          const SizedBox(
-                            height: 16,
-                          ),
-
+                          const Icon(Icons.search_off, size: 64),
+                          const SizedBox(height: 16),
                           const Text(
                             'No matches found',
-                            style:
-                                TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-
-                          const SizedBox(
-                            height: 8,
-                          ),
-
+                          const SizedBox(height: 8),
                           Text(
-                            _searchController
-                                    .text
-                                    .isEmpty
+                            _searchController.text.isEmpty
                                 ? 'No issues match the selected filter.'
                                 : 'No reported issues match "${_searchController.text}".',
-                            textAlign:
-                                TextAlign
-                                    .center,
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -732,34 +494,14 @@ class _FetchReportedIssuesScreenState
 
               else
                 Expanded(
-                  child:
-                      ListView.separated(
-                    padding:
-                        const EdgeInsets
-                            .all(16),
-
-                    itemCount:
-                        filteredIssues
-                            .length,
-
-                    separatorBuilder:
-                        (
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredIssues.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (context, index) => _buildIssueCard(
                       context,
-                      index,
-                    ) =>
-                            const SizedBox(
-                      height: 12,
-                    ),
-
-                    itemBuilder:
-                        (
-                      context,
-                      index,
-                    ) =>
-                            _buildIssueCard(
-                      context,
-                      filteredIssues[
-                          index],
+                      filteredIssues[index],
                     ),
                   ),
                 ),
