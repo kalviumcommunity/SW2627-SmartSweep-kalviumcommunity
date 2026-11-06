@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'core/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
 import 'operations/operations_screen.dart';
@@ -28,10 +29,7 @@ class SmartSweepApp extends StatelessWidget {
           ? Banner(message: 'LEGACY PROTOTYPE', location: BannerLocation.topEnd, child: child!)
           : child!,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.green,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       home: legacyFirebase ? const AuthGate() : const OperationsScreen(),
     );
   }

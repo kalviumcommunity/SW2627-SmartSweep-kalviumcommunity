@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_theme.dart';
 import '../models/waste_collection_route.dart';
+import 'status_chip.dart';
 
 class RouteSummaryCard extends StatelessWidget {
   const RouteSummaryCard({super.key, required this.route});
@@ -9,18 +11,19 @@ class RouteSummaryCard extends StatelessWidget {
 
   Color _statusColor() {
     if (route.isCompleted) {
-      return Colors.green.shade700;
+      return const Color(0xFF0F8A5F);
     }
 
     switch (route.status.toLowerCase()) {
       case 'in progress':
-        return Colors.blue.shade700;
+      case 'in_progress':
+        return const Color(0xFF0284C7);
       case 'delayed':
-        return Colors.orange.shade800;
+        return const Color(0xFFD97706);
       case 'missed':
-        return Colors.red.shade700;
+        return const Color(0xFFDC2626);
       default:
-        return Colors.blueGrey;
+        return const Color(0xFF6B7280);
     }
   }
 
@@ -33,9 +36,10 @@ class RouteSummaryCard extends StatelessWidget {
 
     return Card(
       elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        side: const BorderSide(color: AppTheme.outline, width: 1.2),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -47,47 +51,41 @@ class RouteSummaryCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     route.routeName,
-                    style: Theme.of(context).textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF132B22),
+                        ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withAlpha(30),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    route.status,
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
-                  ),
+                StatusChip(route.status),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.person_outline_rounded, size: 14, color: Color(0xFF5A6E63)),
+                const SizedBox(width: 4),
+                Text(
+                  'Driver: ${route.driverName}',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF5A6E63), fontWeight: FontWeight.w500),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Driver: ${route.driverName}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
             const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 8,
                 color: color,
-                backgroundColor: color.withAlpha(30),
+                backgroundColor: color.withAlpha(25),
               ),
             ),
             const SizedBox(height: 8),
-            Text(route.label()),
+            Text(
+              route.label(),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF4B6056), fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
